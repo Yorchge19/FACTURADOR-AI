@@ -13,10 +13,11 @@ import Expenses from './Expenses';
 import Reports from './Reports';
 import CierreCaja from './CierreCaja';
 import UserManagement from './UserManagement';
+import InventoryCount from './InventoryCount';
 import { useAuth } from '../contexts/AuthContext';
 import { useOrganization } from '../contexts/OrganizationContext';
 import { StorageService } from '../services/storageService';
-import { Product, Customer, Invoice, AppSettings, Expense, Payment, Permission } from '../types';
+import { Product, Customer, Invoice, AppSettings, Expense, Payment, Permission, InventoryAudit } from '../types';
 import { Sparkles, Lock } from 'lucide-react';
 
 /* ── Premium loading screen ──────────────────────────────────────────── */
@@ -91,27 +92,46 @@ const Workspace: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [invoices,  setInvoices]  = useState<Invoice[]>([]);
   const [expenses,  setExpenses]  = useState<Expense[]>([]);
+  const [inventoryAudits, setInventoryAudits] = useState<InventoryAudit[]>([]);
   const [settings,  setSettings]  = useState<AppSettings>({
     companyName: '', companyTaxId: '', currency: '', taxRate: 0, address: '', exchangeRate: 520,
   });
 
   useEffect(() => {
     const loadData = async () => {
-      if (!user || !orgId) return;
+      if (!user) return;
+      // En modo demo sin orgId aún, permitimos carga desde localStorage (orgId undefined)
+      // OrgRoute ya garantiza orgId en modo Firebase, pero no bloqueamos demo
+      if (!orgId) {
+        // Si no hay orgId y estamos cargando organización, esperar
+        if (orgLoading) return;
+        // En demo sin org, igual intentar cargar datos locales para no dejar pantalla vacía
+      }
       try {
         setLoadingData(true);
-        const [prodData, custData, invData, expData, settData] = await Promise.all([
-          StorageService.getProducts(orgId),
-          StorageService.getCustomers(orgId),
-          StorageService.getInvoices(orgId),
-          StorageService.getExpenses(orgId),
-          StorageService.getSettings(orgId),
+        const effectiveOrgId = orgId ?? undefined;
+        const [prodData, custData, invData, expData, settData, auditsData] = await Promise.all([
+          StorageService.getProducts(effectiveOrgId).catch(() => [] as Product[]),
+          StorageService.getCustomers(effectiveOrgId).catch(() => [] as Customer[]),
+          StorageService.getInvoices(effectiveOrgId).catch(() => [] as Invoice[]),
+          StorageService.getExpenses(effectiveOrgId).catch(() => [] as Expense[]),
+          StorageService.getSettings(effectiveOrgId).catch(() => ({ companyName: '', companyTaxId: '', currency: 'CRC', taxRate: 13, address: '', exchangeRate: 520 } as AppSettings)),
+          StorageService.getInventoryAudits(effectiveOrgId).catch(() => [] as InventoryAudit[]),
         ]);
         setProducts(prodData);
         setCustomers(custData);
         setInvoices(invData);
         setExpenses(expData);
         setSettings(settData);
+        setInventoryAudits(auditsData);
+        // Si no hay productos y estamos en modo demo/localStorage, sembrar datos de ejemplo
+        if (prodData.length === 0) {
+          try {
+            await StorageService.seedData(effectiveOrgId);
+            const seeded = await StorageService.getProducts(effectiveOrgId).catch(() => [] as Product[]);
+            if (seeded.length > 0) setProducts(seeded);
+          } catch {}
+        }
       } catch (error) {
         console.error('Error loading workspace data', error);
       } finally {
@@ -119,7 +139,7 @@ const Workspace: React.FC = () => {
       }
     };
     loadData();
-  }, [user, orgId]);
+  }, [user, orgId, orgLoading]);
 
   if (orgLoading || loadingData) return <WorkspaceLoader />;
 
@@ -207,6 +227,10 @@ const Workspace: React.FC = () => {
     setExpenses(prev => prev.filter(e => e.id !== id));
     await StorageService.deleteExpense(id, orgId ?? undefined);
   };
+  const handleSaveInventoryAudit = async (audit: InventoryAudit) => {
+    setInventoryAudits(prev => [audit, ...prev]);
+    await StorageService.saveInventoryAudit(audit, orgId ?? undefined);
+  };
   const handleSaveSettings = async (s: AppSettings) => {
     setSettings(s);
     await StorageService.saveSettings(s, orgId ?? undefined);
@@ -225,6 +249,11 @@ const Workspace: React.FC = () => {
           <PermGuard perm="manage_inventory">
             <Inventory products={products} onAddProduct={handleAddProduct}
               onUpdateProduct={handleUpdateProduct} onDeleteProduct={handleDeleteProduct} />
+          </PermGuard>
+        } />
+        <Route path="/inventory-count" element={
+          <PermGuard perm="manage_inventory">
+            <InventoryCount products={products} audits={inventoryAudits} onSaveAudit={handleSaveInventoryAudit} />
           </PermGuard>
         } />
         <Route path="/customers" element={

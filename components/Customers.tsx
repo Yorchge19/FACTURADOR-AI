@@ -69,33 +69,35 @@ const Customers: React.FC<CustomersProps> = ({ customers, onAddCustomer }) => {
   );
 
   return (
-    <div className="space-y-8 animate-fade-in pb-10">
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+    <div className="space-y-6 md:space-y-8 animate-fade-in pb-20 md:pb-10">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">Clientes</h2>
-          <p className="text-gray-500 mt-1">Directorio para Facturación Electrónica</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Clientes</h2>
+          <p className="text-gray-500 mt-1 text-sm md:text-base">Directorio para Facturación Electrónica</p>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)} 
-          className="bg-black text-white px-5 py-2.5 rounded-xl hover:bg-gray-800 flex items-center gap-2 shadow-lg shadow-gray-200 transition-all active:scale-95 border border-black"
+          className="w-full md:w-auto bg-black text-white px-5 py-3 md:py-2.5 rounded-xl hover:bg-gray-800 flex justify-center items-center gap-2 shadow-lg shadow-gray-200 transition-all active:scale-95 border border-black"
         >
           <Plus size={20} /> Nuevo Cliente
         </button>
       </div>
 
       {/* Search Bar */}
-      <div className="relative max-w-md">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4">
+        <div className="relative w-full md:max-w-md">
          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-         <input 
-            type="text" 
-            placeholder="Buscar por nombre o cédula..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none bg-white"
-         />
-      </div>
+          <input 
+             type="text" 
+             placeholder="Buscar por nombre o cédula..." 
+             value={searchTerm}
+             onChange={(e) => setSearchTerm(e.target.value)}
+             className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none bg-gray-50"
+          />
+        </div>
+       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
         {filteredCustomers.map(c => (
           <div key={c.id} className="group bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-300 overflow-hidden relative">
             <div className="h-2 bg-black w-full"></div>
@@ -145,17 +147,17 @@ const Customers: React.FC<CustomersProps> = ({ customers, onAddCustomer }) => {
 
       {/* Modal Completo para Factura Electrónica */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden animate-scale-in my-8 flex flex-col max-h-[90vh]">
-            <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end md:items-center justify-center z-50 p-0 md:p-4 transition-all">
+          <div className="bg-white rounded-t-2xl md:rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden animate-slide-up md:animate-scale-in flex flex-col max-h-[90vh]">
+            <div className="flex justify-between items-center p-4 md:p-6 border-b border-gray-100 bg-gray-50 flex-shrink-0">
               <div>
-                <h3 className="text-xl font-bold text-gray-900">Datos del Cliente</h3>
-                <p className="text-sm text-gray-500">Información requerida para Factura Electrónica</p>
+                <h3 className="text-lg md:text-xl font-bold text-gray-900">Datos del Cliente</h3>
+                <p className="text-xs md:text-sm text-gray-500">Información requerida para Factura Electrónica</p>
               </div>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full p-2 transition-colors"><X size={20} /></button>
+              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full p-2 transition-colors flex-shrink-0"><X size={20} /></button>
             </div>
             
-            <div className="overflow-y-auto p-8">
+            <div className="overflow-y-auto p-4 md:p-8 flex-1">
             <form id="customerForm" onSubmit={handleSubmit} className="space-y-8">
               
               {/* Identificación */}
@@ -275,9 +277,9 @@ const Customers: React.FC<CustomersProps> = ({ customers, onAddCustomer }) => {
               </form>
             </div>
             
-            <div className="flex justify-end gap-3 p-6 border-t border-gray-100 bg-gray-50">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2.5 text-gray-600 hover:bg-gray-100 rounded-xl font-medium transition-colors">Cancelar</button>
-                <button type="submit" form="customerForm" className="px-6 py-2.5 bg-black text-white rounded-xl hover:bg-gray-800 font-medium shadow-lg shadow-gray-200 transition-all border border-black">Guardar Cliente</button>
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 p-4 md:p-6 border-t border-gray-100 bg-gray-50">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="w-full sm:w-auto px-6 py-3 md:py-2.5 text-gray-600 hover:bg-gray-100 rounded-xl font-medium transition-colors">Cancelar</button>
+                <button type="submit" form="customerForm" className="w-full sm:w-auto px-6 py-3 md:py-2.5 bg-black text-white rounded-xl hover:bg-gray-800 font-medium shadow-lg shadow-gray-200 transition-all border border-black">Guardar Cliente</button>
             </div>
           </div>
         </div>

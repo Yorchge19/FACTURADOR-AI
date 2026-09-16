@@ -133,7 +133,7 @@ const Dashboard: React.FC<DashboardProps> = ({ invoices, products }) => {
   const statusLabel: Record<string, string> = { paid: 'Pagada', pending: 'Pendiente', cancelled: 'Anulada' };
 
   return (
-    <div className="space-y-6 pb-10">
+    <div className="space-y-6 md:space-y-8 animate-fade-in pb-20 md:pb-10">
 
       {/* ── Header ── */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -143,17 +143,17 @@ const Dashboard: React.FC<DashboardProps> = ({ invoices, products }) => {
             {new Date().toLocaleDateString('es-CR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
-        <div className="flex gap-3 flex-wrap">
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
           <button
             onClick={() => navigate('/workspace/create-invoice')}
-            className="flex items-center gap-2 px-4 py-2.5 bg-black text-white rounded-xl font-semibold text-sm hover:bg-gray-800 transition-all active:scale-95 shadow-md"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-black text-white rounded-xl font-semibold text-sm hover:bg-gray-800 transition-all active:scale-95 shadow-md"
           >
             <Plus size={16} /> Nueva Factura
           </button>
           <button
             onClick={handleAiAnalysis}
             disabled={loadingAi}
-            className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 bg-white text-gray-700 rounded-xl font-semibold text-sm hover:border-gray-400 hover:text-gray-900 transition-all disabled:opacity-60 active:scale-95"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 bg-white text-gray-700 rounded-xl font-semibold text-sm hover:border-gray-400 hover:text-gray-900 transition-all disabled:opacity-60 active:scale-95"
           >
             <Sparkles size={16} className={loadingAi ? 'animate-spin text-black' : ''} />
             {loadingAi ? 'Analizando...' : 'Analizar con IA'}
@@ -177,7 +177,7 @@ const Dashboard: React.FC<DashboardProps> = ({ invoices, products }) => {
       )}
 
       {/* ── Stat Cards ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Ingresos Totales"
           value={fmt(totalRevenue)}
@@ -213,7 +213,7 @@ const Dashboard: React.FC<DashboardProps> = ({ invoices, products }) => {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
 
         {/* Area chart — wider */}
-        <div className="lg:col-span-3 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div className="lg:col-span-3 bg-white rounded-2xl border border-gray-100 shadow-sm p-4 md:p-6">
           <div className="flex justify-between items-center mb-6">
             <div>
               <h3 className="font-bold text-gray-900">Tendencia de Ventas</h3>
@@ -223,7 +223,7 @@ const Dashboard: React.FC<DashboardProps> = ({ invoices, products }) => {
               {chartData.length} días
             </span>
           </div>
-          <div className="h-60 w-full">
+          <div className="h-52 sm:h-60 w-full">
             {chartData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData}>
@@ -256,14 +256,14 @@ const Dashboard: React.FC<DashboardProps> = ({ invoices, products }) => {
         </div>
 
         {/* Bar chart — narrow */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-4 md:p-6">
           <div className="flex justify-between items-center mb-6">
             <div>
               <h3 className="font-bold text-gray-900">Ventas por Fecha</h3>
               <p className="text-xs text-gray-400 mt-0.5">Montos por transacción</p>
             </div>
           </div>
-          <div className="h-60 w-full">
+          <div className="h-52 sm:h-60 w-full">
             {chartData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData}>

@@ -6,7 +6,7 @@ import {
   Settings as SettingsIcon, Menu, LogOut, X,
   PieChart, Receipt, ChevronLeft, ChevronRight,
   Cloud, WifiOff, Wallet, Home, Sparkles, Bell, Lock,
-  Crown, ShieldCheck, Building2
+  Crown, ShieldCheck, Building2, ClipboardList
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useOrganization } from '../contexts/OrganizationContext';
@@ -45,9 +45,10 @@ const ALL_MENU_GROUPS: MenuGroup[] = [
   {
     label: 'Gestión',
     items: [
-      { path: '/workspace/inventory', icon: Package,   label: 'Inventario', permission: 'manage_inventory' },
-      { path: '/workspace/customers', icon: Users,     label: 'Clientes',   permission: 'manage_customers' },
-      { path: '/workspace/reports',   icon: PieChart,  label: 'Reportes',   permission: 'view_reports'    },
+      { path: '/workspace/inventory', icon: Package,       label: 'Inventario',         permission: 'manage_inventory' },
+      { path: '/workspace/inventory-count', icon: ClipboardList, label: 'Tomas de Inventario', permission: 'manage_inventory' },
+      { path: '/workspace/customers', icon: Users,         label: 'Clientes',           permission: 'manage_customers' },
+      { path: '/workspace/reports',   icon: PieChart,      label: 'Reportes',           permission: 'view_reports'    },
     ],
   },
   {

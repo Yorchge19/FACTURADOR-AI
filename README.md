@@ -4,7 +4,7 @@ Sistema de facturación, inventario y gestión empresarial potenciado por Inteli
 
 ## 🚀 Características Principales
 
-### 🧠 Inteligencia Artificial (Gemini 2.5)
+### 🧠 Inteligencia Artificial 
 - **Generador de Descripciones:** Crea descripciones de productos atractivas y profesionales automáticamente.
 - **Business Insights:** Analiza tus facturas y niveles de inventario para ofrecer consejos estratégicos sobre ventas y reabastecimiento.
 

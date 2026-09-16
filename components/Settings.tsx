@@ -59,17 +59,17 @@ const Settings: React.FC<SettingsProps> = ({ settings, onSaveSettings }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-fade-in pb-10">
+    <div className="max-w-4xl mx-auto space-y-6 md:space-y-8 animate-fade-in pb-20 md:pb-10">
       <div>
-        <h2 className="text-3xl font-bold text-gray-900">Configuración</h2>
-        <p className="text-gray-500 mt-1">Información del Emisor y Parámetros del Sistema</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Configuración</h2>
+        <p className="text-gray-500 mt-1 text-sm md:text-base">Información del Emisor y Parámetros del Sistema</p>
       </div>
       
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         <form onSubmit={handleSubmit}>
           {/* Company Section */}
-          <div className="p-8 border-b border-gray-100">
-            <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2 mb-6">
+          <div className="p-4 md:p-8 border-b border-gray-100">
+            <h3 className="text-base md:text-lg font-bold text-gray-800 flex items-center gap-2 mb-4 md:mb-6">
               <Building2 className="text-black" size={20} /> Datos del Emisor
             </h3>
             <div className="grid grid-cols-1 gap-6">
@@ -184,8 +184,8 @@ const Settings: React.FC<SettingsProps> = ({ settings, onSaveSettings }) => {
           </div>
 
           {/* Hacienda API Configuration Section */}
-          <div className="p-8 border-b border-gray-100 bg-gray-50/50">
-            <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2 mb-6">
+          <div className="p-4 md:p-8 border-b border-gray-100 bg-gray-50/50">
+            <h3 className="text-base md:text-lg font-bold text-gray-800 flex items-center gap-2 mb-4 md:mb-6">
               <ShieldCheck className="text-gray-600" size={20} /> Facturación Electrónica (Modo Pruebas)
             </h3>
             <div className="mb-6 bg-white border border-gray-200 rounded-xl p-4 flex gap-3 items-start">
@@ -262,8 +262,8 @@ const Settings: React.FC<SettingsProps> = ({ settings, onSaveSettings }) => {
           </div>
 
           {/* Financial & Footer Section */}
-          <div className="p-8 bg-gray-50/30">
-            <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2 mb-6">
+          <div className="p-4 md:p-8 bg-gray-50/30">
+            <h3 className="text-base md:text-lg font-bold text-gray-800 flex items-center gap-2 mb-4 md:mb-6">
               <Receipt className="text-black" size={20} /> Configuración de Factura y Moneda
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -322,13 +322,13 @@ const Settings: React.FC<SettingsProps> = ({ settings, onSaveSettings }) => {
           </div>
 
           {/* Footer Action */}
-          <div className="p-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between sticky bottom-0 z-10">
-            <div className="text-sm text-gray-500">
+          <div className="p-4 md:p-6 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sticky bottom-0 z-10">
+            <div className="text-xs md:text-sm text-gray-500">
               {saved ? <span className="text-black font-bold animate-pulse flex items-center gap-1">Cambios guardados correctamente</span> : "Recuerda guardar tus cambios."}
             </div>
             <button 
               type="submit" 
-              className="bg-black text-white px-8 py-3 rounded-xl font-semibold hover:bg-gray-800 shadow-lg shadow-gray-200 flex items-center gap-2 transition-all active:scale-95 border border-black"
+              className="w-full sm:w-auto bg-black text-white px-6 md:px-8 py-3 rounded-xl font-semibold hover:bg-gray-800 shadow-lg shadow-gray-200 flex items-center justify-center gap-2 transition-all active:scale-95 border border-black"
             >
               <Save size={20} /> Guardar Configuración
             </button>
