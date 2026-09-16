@@ -142,28 +142,28 @@ const Login: React.FC = () => {
       </div>
 
       {/* ── RIGHT PANEL (form) ───────────────────────────────────────── */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 relative bg-gray-50">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 relative bg-gray-50 overflow-y-auto">
         {/* Back button */}
         <button onClick={() => navigate('/')}
-          className="absolute top-6 left-6 flex items-center gap-2 bg-white border border-gray-200 text-gray-600 hover:text-black px-4 py-2 rounded-xl transition-all text-sm font-medium shadow-sm hover:shadow-md">
-          <ArrowLeft size={16} />Inicio
+          className="absolute top-4 left-4 sm:top-6 sm:left-6 flex items-center gap-1.5 sm:gap-2 bg-white border border-gray-200 text-gray-600 hover:text-black px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl transition-all text-xs sm:text-sm font-medium shadow-sm hover:shadow-md">
+          <ArrowLeft size={14} className="sm:w-4 sm:h-4" />Inicio
         </button>
 
-        <div className={`w-full max-w-md transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <div className={`w-full max-w-md transition-all duration-700 mt-12 sm:mt-0 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
 
           {/* Mobile logo */}
-          <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
-            <div className="h-12 w-12 rounded-xl bg-black flex items-center justify-center shadow-xl">
-              <LayoutDashboard size={22} className="text-white" />
+          <div className="lg:hidden flex items-center justify-center gap-2 sm:gap-3 mb-6 sm:mb-8">
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-black flex items-center justify-center shadow-xl flex-shrink-0">
+              <LayoutDashboard size={20} className="text-white sm:w-[22px] sm:h-[22px]" />
             </div>
-            <h1 className="text-xl font-black text-gray-900">Facturador AI</h1>
+            <h1 className="text-lg sm:text-xl font-black text-gray-900 truncate">Facturador AI</h1>
           </div>
 
           {/* Card */}
           <div className="rounded-3xl overflow-hidden shadow-2xl bg-white border border-gray-100">
 
             {/* Card header — black */}
-            <div className="relative p-8 overflow-hidden bg-black">
+            <div className="relative p-6 sm:p-8 overflow-hidden bg-black">
               {/* Decoration */}
               <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-10"
                 style={{ background: 'radial-gradient(circle, white 0%, transparent 70%)', transform: 'translate(30%, -40%)' }} />
@@ -177,14 +177,14 @@ const Login: React.FC = () => {
                 <p className="text-gray-500 text-sm font-medium mb-1">
                   {isRegistering ? 'Crear una cuenta nueva' : 'Bienvenido de nuevo'}
                 </p>
-                <h2 className="text-2xl font-black text-white">
+                <h2 className="text-xl sm:text-2xl font-black text-white">
                   {isRegistering ? 'Regístrate' : 'Inicia sesión'}
                 </h2>
               </div>
             </div>
 
             {/* Form body */}
-            <div className="p-8">
+            <div className="p-6 sm:p-8">
               <form onSubmit={handleSubmit} className="space-y-5">
 
                 {/* Error */}

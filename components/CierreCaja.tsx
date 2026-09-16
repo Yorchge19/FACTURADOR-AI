@@ -123,7 +123,7 @@ const CierreCaja: React.FC<CierreCajaProps> = ({ invoices }) => {
 
   /* ── UI ── */
   return (
-    <div className="space-y-6 pb-16 animate-fade-in">
+    <div className="space-y-6 md:space-y-8 pb-20 md:pb-16 animate-fade-in">
 
       {/* ── Page Header ── */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -147,11 +147,11 @@ const CierreCaja: React.FC<CierreCajaProps> = ({ invoices }) => {
       </div>
 
       {/* ── Filter Card ── */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <h3 className="font-bold text-gray-800 text-base mb-4 flex items-center gap-2">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 md:p-6">
+        <h3 className="font-bold text-gray-800 text-sm md:text-base mb-4 flex items-center gap-2">
           <Calendar size={18} /> Seleccionar Período
         </h3>
-        <div className="flex flex-col sm:flex-row gap-4 items-end">
+        <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
           <div className="flex-1">
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
               Fecha Desde
@@ -178,14 +178,14 @@ const CierreCaja: React.FC<CierreCajaProps> = ({ invoices }) => {
           </div>
           <button
             onClick={() => setGenerated(true)}
-            className="flex items-center gap-2 px-6 py-2.5 bg-black text-white rounded-xl font-bold text-sm hover:bg-gray-800 active:scale-95 transition-all shadow-md whitespace-nowrap"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-black text-white rounded-xl font-bold text-sm hover:bg-gray-800 active:scale-95 transition-all shadow-md whitespace-nowrap"
           >
             <Lock size={16} /> Generar Cierre
           </button>
           {generated && (
             <button
               onClick={() => setGenerated(false)}
-              className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 text-gray-500 rounded-xl font-medium text-sm hover:border-gray-400 hover:text-gray-800 transition-all"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 text-gray-500 rounded-xl font-medium text-sm hover:border-gray-400 hover:text-gray-800 transition-all"
             >
               <X size={16} /> Limpiar
             </button>

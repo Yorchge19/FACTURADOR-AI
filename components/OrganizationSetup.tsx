@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { OrganizationService } from '../services/organizationService';
+import { isFirebaseInitialized } from '../services/firebase';
 import { logger } from '../services/logger';
 import {
   Building2, Users, Plus, Key, Loader2, ChevronRight,
@@ -48,6 +49,18 @@ const OrganizationSetup: React.FC = () => {
     setLoading(true);
     setError('');
     try {
+      // Modo demo (sin Firebase): crear org local en localStorage
+      if (!isFirebaseInitialized) {
+        const demoOrgId = 'demo-org-' + Date.now();
+        localStorage.setItem('fai_demo_orgId', demoOrgId);
+        localStorage.setItem('fai_demo_orgName', orgName.trim());
+        // Forzar recarga del perfil demo (AuthContext lee fai_demo_orgId en refresh)
+        // Actualizar el perfil en memoria via reload
+        await new Promise(r => setTimeout(r, 300));
+        window.location.hash = '#/workspace';
+        window.location.reload();
+        return;
+      }
       await OrganizationService.createOrganization(
         user!.uid,
         email,
@@ -69,6 +82,22 @@ const OrganizationSetup: React.FC = () => {
     setError('');
     setSuccess('');
     try {
+      // Modo demo: simular unión aceptando cualquier código de 6 caracteres
+      if (!isFirebaseInitialized) {
+        const code = inviteCode.trim().toUpperCase();
+        if (code.length !== 6) {
+          setError('El código debe tener 6 caracteres.');
+          setLoading(false);
+          return;
+        }
+        const demoOrgId = 'demo-org-joined-' + code + '-' + Date.now();
+        localStorage.setItem('fai_demo_orgId', demoOrgId);
+        setSuccess('¡Te has unido! Cargando tu espacio de trabajo…');
+        await new Promise(r => setTimeout(r, 500));
+        window.location.hash = '#/workspace';
+        window.location.reload();
+        return;
+      }
       const result = await OrganizationService.redeemInviteCode(
         inviteCode.trim(),
         user!.uid,
@@ -90,7 +119,7 @@ const OrganizationSetup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden">
       {/* Background orbs */}
       <div className="absolute top-[-10%] left-[-10%] w-96 h-96 rounded-full opacity-5 animate-orb"
         style={{ background: 'radial-gradient(circle, #ffffff 0%, transparent 70%)' }} />
@@ -99,15 +128,15 @@ const OrganizationSetup: React.FC = () => {
       <div className="absolute inset-0 opacity-[0.03]"
         style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px)', backgroundSize: '50px 50px' }} />
 
-      <div className="relative z-10 w-full max-w-md animate-fade-in">
+      <div className="relative z-10 w-full max-w-md animate-fade-in px-1 sm:px-0">
 
         {/* Logo */}
-        <div className="flex items-center justify-center gap-3 mb-10">
-          <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center shadow-2xl">
+        <div className="flex items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-10">
+          <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-2xl bg-white flex items-center justify-center shadow-2xl flex-shrink-0">
             <Sparkles size={22} className="text-black" />
           </div>
-          <div>
-            <h1 className="text-xl font-black text-white">Facturador AI</h1>
+          <div className="text-left min-w-0">
+            <h1 className="text-lg sm:text-xl font-black text-white truncate">Facturador AI</h1>
             <p className="text-gray-600 text-xs">Configuración inicial</p>
           </div>
         </div>
@@ -115,40 +144,40 @@ const OrganizationSetup: React.FC = () => {
         {/* ── STEP: choose ─────────────────────────────────────── */}
         {step === 'choose' && (
           <div className="space-y-4">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-black text-white mb-2">Bienvenido</h2>
-              <p className="text-gray-400 text-sm">
-                Hola, <span className="text-white font-semibold">{email}</span>.<br />
+            <div className="text-center mb-6 sm:mb-8 px-2">
+              <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">Bienvenido</h2>
+              <p className="text-gray-400 text-sm break-words">
+                Hola, <span className="text-white font-semibold break-all">{email}</span>.<br />
                 Para continuar, crea una organización o únete a una existente.
               </p>
             </div>
 
             <button
               onClick={() => setStep('create')}
-              className="w-full group relative overflow-hidden bg-white text-black rounded-2xl p-5 flex items-center gap-4 font-bold hover:bg-gray-100 transition-all shadow-xl"
+              className="w-full group relative overflow-hidden bg-white text-black rounded-2xl p-4 sm:p-5 flex items-center gap-3 sm:gap-4 font-bold hover:bg-gray-100 transition-all shadow-xl"
             >
-              <div className="h-12 w-12 rounded-xl bg-black flex items-center justify-center flex-shrink-0 shadow-inner">
-                <Building2 size={22} className="text-white" />
+              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-black flex items-center justify-center flex-shrink-0 shadow-inner">
+                <Building2 size={20} className="text-white sm:h-[22px] sm:w-[22px]" />
               </div>
-              <div className="text-left flex-1">
-                <p className="font-black text-lg">Crear una organización</p>
-                <p className="text-gray-500 font-normal text-sm">Soy dueño de un negocio</p>
+              <div className="text-left flex-1 min-w-0">
+                <p className="font-black text-base sm:text-lg truncate">Crear una organización</p>
+                <p className="text-gray-500 font-normal text-xs sm:text-sm truncate">Soy dueño de un negocio</p>
               </div>
-              <ChevronRight size={20} className="text-gray-400 group-hover:translate-x-1 transition-transform" />
+              <ChevronRight size={20} className="text-gray-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
             </button>
 
             <button
               onClick={() => setStep('join')}
-              className="w-full group bg-white/5 hover:bg-white/10 border border-white/15 text-white rounded-2xl p-5 flex items-center gap-4 font-bold transition-all"
+              className="w-full group bg-white/5 hover:bg-white/10 border border-white/15 text-white rounded-2xl p-4 sm:p-5 flex items-center gap-3 sm:gap-4 font-bold transition-all"
             >
-              <div className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
-                <Key size={22} className="text-gray-300" />
+              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                <Key size={20} className="text-gray-300 sm:h-[22px] sm:w-[22px]" />
               </div>
-              <div className="text-left flex-1">
-                <p className="font-black text-lg">Unirme con un código</p>
-                <p className="text-gray-500 font-normal text-sm">Tengo un código de invitación</p>
+              <div className="text-left flex-1 min-w-0">
+                <p className="font-black text-base sm:text-lg truncate">Unirme con un código</p>
+                <p className="text-gray-500 font-normal text-xs sm:text-sm truncate">Tengo un código de invitación</p>
               </div>
-              <ChevronRight size={20} className="text-gray-500 group-hover:translate-x-1 transition-transform" />
+              <ChevronRight size={20} className="text-gray-500 group-hover:translate-x-1 transition-transform flex-shrink-0" />
             </button>
 
             <button
@@ -167,13 +196,13 @@ const OrganizationSetup: React.FC = () => {
               className="flex items-center gap-2 text-gray-500 hover:text-white text-sm mb-8 transition-colors">
               <ArrowLeft size={15} /> Volver
             </button>
-            <div className="bg-white/[0.04] border border-white/10 rounded-3xl p-8">
+            <div className="bg-white/[0.04] border border-white/10 rounded-3xl p-5 sm:p-8">
               <div className="flex items-center gap-3 mb-6">
-                <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center shadow-lg">
+                <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center shadow-lg flex-shrink-0">
                   <Building2 size={20} className="text-black" />
                 </div>
-                <div>
-                  <h2 className="text-xl font-black text-white">Nueva Organización</h2>
+                <div className="min-w-0">
+                  <h2 className="text-lg sm:text-xl font-black text-white">Nueva Organización</h2>
                   <p className="text-gray-500 text-xs">Serás el administrador (owner)</p>
                 </div>
               </div>
@@ -220,13 +249,13 @@ const OrganizationSetup: React.FC = () => {
               className="flex items-center gap-2 text-gray-500 hover:text-white text-sm mb-8 transition-colors">
               <ArrowLeft size={15} /> Volver
             </button>
-            <div className="bg-white/[0.04] border border-white/10 rounded-3xl p-8">
+            <div className="bg-white/[0.04] border border-white/10 rounded-3xl p-5 sm:p-8">
               <div className="flex items-center gap-3 mb-6">
-                <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center shadow-lg">
+                <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center shadow-lg flex-shrink-0">
                   <Key size={20} className="text-black" />
                 </div>
-                <div>
-                  <h2 className="text-xl font-black text-white">Unirse con Código</h2>
+                <div className="min-w-0">
+                  <h2 className="text-lg sm:text-xl font-black text-white">Unirse con Código</h2>
                   <p className="text-gray-500 text-xs">Solicita el código al administrador</p>
                 </div>
               </div>
@@ -244,7 +273,7 @@ const OrganizationSetup: React.FC = () => {
                     onChange={e => setInviteCode(e.target.value.toUpperCase())}
                     placeholder="ABC123"
                     maxLength={6}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/15 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/30 transition-all text-center text-2xl font-mono tracking-[0.5em]"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/15 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/30 transition-all text-center text-xl sm:text-2xl font-mono tracking-[0.3em] sm:tracking-[0.5em]"
                   />
                 </div>
 

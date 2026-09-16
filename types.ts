@@ -189,3 +189,24 @@ export interface InviteCode {
   expiresAt: string;
   used: boolean;
 }
+
+// ── Tomas de Inventario (auditoría física) ───────────────────────────────────
+
+export interface InventoryCountItem {
+  productId: string;
+  sku: string;
+  productName: string;
+  countedQty: number;
+  systemStock: number;
+}
+
+export interface InventoryAudit {
+  id: string;
+  date: string; // ISO string
+  userId?: string;
+  userName?: string;
+  items: InventoryCountItem[];
+  matched: InventoryCountItem[];
+  missing: (InventoryCountItem & { diff: number })[];
+  extra: (InventoryCountItem & { diff: number })[];
+}

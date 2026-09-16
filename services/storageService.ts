@@ -1,5 +1,5 @@
 
-import { Product, Customer, Invoice, AppSettings, InvoiceItem, Expense, Payment } from '../types';
+import { Product, Customer, Invoice, AppSettings, InvoiceItem, Expense, Payment, InventoryAudit } from '../types';
 import { db } from './firebase';
 import {
   collection,
@@ -21,11 +21,12 @@ import { logger } from './logger';
 // When Firebase is not initialized (demo mode) we fall through to localStorage.
 
 const COLLECTIONS = {
-  PRODUCTS:  'products',
-  CUSTOMERS: 'customers',
-  INVOICES:  'invoices',
-  EXPENSES:  'expenses',
-  SETTINGS:  'settings',
+  PRODUCTS:         'products',
+  CUSTOMERS:        'customers',
+  INVOICES:         'invoices',
+  EXPENSES:         'expenses',
+  SETTINGS:         'settings',
+  INVENTORY_AUDITS: 'inventoryAudits',
 };
 
 /** Returns a Firestore collection reference scoped to the active organization */
@@ -283,6 +284,22 @@ export const StorageService = {
       return;
     }
     await setDoc(doc(db!, 'organizations', orgId, COLLECTIONS.SETTINGS, 'general'), settings);
+  },
+
+  // Inventory Audits
+  getInventoryAudits: async (orgId?: string): Promise<InventoryAudit[]> => {
+    if (!db || !orgId) {
+      return ls.get<InventoryAudit>(COLLECTIONS.INVENTORY_AUDITS)
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }
+    const snap = await getDocs(orgCol(orgId, COLLECTIONS.INVENTORY_AUDITS));
+    return snapshotToData<InventoryAudit>(snap)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  },
+
+  saveInventoryAudit: async (audit: InventoryAudit, orgId?: string): Promise<void> => {
+    if (!db || !orgId) return ls.add(COLLECTIONS.INVENTORY_AUDITS, audit);
+    await setDoc(orgDoc(orgId, COLLECTIONS.INVENTORY_AUDITS, audit.id), audit);
   },
 
   // Seed demo data
