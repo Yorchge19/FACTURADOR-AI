@@ -61,37 +61,37 @@ const Settings: React.FC<SettingsProps> = ({ settings, onSaveSettings }) => {
   return (
     <div className="max-w-4xl mx-auto space-y-6 md:space-y-8 animate-fade-in pb-20 md:pb-10">
       <div>
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Configuración</h2>
-        <p className="text-gray-500 mt-1 text-sm md:text-base">Información del Emisor y Parámetros del Sistema</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Configuración</h2>
+        <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm md:text-base">Información del Emisor y Parámetros del Sistema</p>
       </div>
       
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <form onSubmit={handleSubmit}>
           {/* Company Section */}
-          <div className="p-4 md:p-8 border-b border-gray-100">
-            <h3 className="text-base md:text-lg font-bold text-gray-800 flex items-center gap-2 mb-4 md:mb-6">
+          <div className="p-4 md:p-8 border-b border-gray-100 dark:border-gray-800">
+            <h3 className="text-base md:text-lg font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2 mb-4 md:mb-6">
               <Building2 className="text-black" size={20} /> Datos del Emisor
             </h3>
             <div className="grid grid-cols-1 gap-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">Razón Social (Nombre Legal)</label>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Razón Social (Nombre Legal)</label>
                   <input 
                     type="text" 
                     required
                     value={formData.companyName} 
                     onChange={e => setFormData({...formData, companyName: e.target.value})}
-                    className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all"
+                    className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white dark:border-white outline-none transition-all dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                     placeholder="Ej. Inversiones del Valle S.A."
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">Nombre Comercial</label>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Nombre Comercial</label>
                   <input 
                     type="text" 
                     value={formData.commercialName || ''} 
                     onChange={e => setFormData({...formData, commercialName: e.target.value})}
-                    className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all"
+                    className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white dark:border-white outline-none transition-all dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                     placeholder="Ej. Tienda El Valle"
                   />
                 </div>
@@ -99,23 +99,23 @@ const Settings: React.FC<SettingsProps> = ({ settings, onSaveSettings }) => {
 
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">Cédula Jurídica / Física</label>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Cédula Jurídica / Física</label>
                     <input 
                       type="text" 
                       required
                       value={formData.companyTaxId} 
                       onChange={e => setFormData({...formData, companyTaxId: e.target.value})}
-                      className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all"
+                      className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white dark:border-white outline-none transition-all dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                       placeholder="3-101-123456"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">Teléfono</label>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Teléfono</label>
                     <input 
                        type="text" 
                        value={formData.companyPhone || ''} 
                        onChange={e => setFormData({...formData, companyPhone: e.target.value})}
-                       className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all"
+                       className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white dark:border-white outline-none transition-all dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                        placeholder="2222-2222"
                     />
                   </div>
@@ -123,29 +123,29 @@ const Settings: React.FC<SettingsProps> = ({ settings, onSaveSettings }) => {
 
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">Email Facturación</label>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Email Facturación</label>
                     <input 
                        type="email" 
                        value={formData.companyEmail || ''} 
                        onChange={e => setFormData({...formData, companyEmail: e.target.value})}
-                       className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all"
+                       className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white dark:border-white outline-none transition-all dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                        placeholder="facturacion@empresa.com"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">Sitio Web</label>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Sitio Web</label>
                     <input 
                        type="text" 
                        value={formData.companyWebsite || ''} 
                        onChange={e => setFormData({...formData, companyWebsite: e.target.value})}
-                       className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all"
+                       className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white dark:border-white outline-none transition-all dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                        placeholder="www.empresa.com"
                     />
                   </div>
                </div>
               
-              <div className="border-t border-gray-100 pt-4">
-                  <label className="block text-sm font-semibold text-gray-700 flex items-center gap-2 mb-3">
+              <div className="border-t border-gray-100 dark:border-gray-800 pt-4">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2 mb-3">
                     <MapPin size={16} className="text-black" /> Ubicación Fiscal
                   </label>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
@@ -153,21 +153,21 @@ const Settings: React.FC<SettingsProps> = ({ settings, onSaveSettings }) => {
                         type="text"
                         value={formData.province || ''} 
                         onChange={e => setFormData({...formData, province: e.target.value})}
-                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all"
+                        className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white dark:border-white outline-none transition-all dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                         placeholder="Provincia"
                       />
                       <input
                         type="text"
                         value={formData.canton || ''} 
                         onChange={e => setFormData({...formData, canton: e.target.value})}
-                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all"
+                        className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white dark:border-white outline-none transition-all dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                         placeholder="Cantón"
                       />
                       <input
                         type="text"
                         value={formData.district || ''} 
                         onChange={e => setFormData({...formData, district: e.target.value})}
-                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all"
+                        className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white dark:border-white outline-none transition-all dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                         placeholder="Distrito"
                       />
                   </div>
@@ -176,7 +176,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onSaveSettings }) => {
                     required
                     value={formData.address} 
                     onChange={e => setFormData({...formData, address: e.target.value})}
-                    className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all"
+                    className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white dark:border-white outline-none transition-all dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                     placeholder="Otras señas (Barrio, calles, número de local)"
                   />
               </div>
@@ -184,15 +184,15 @@ const Settings: React.FC<SettingsProps> = ({ settings, onSaveSettings }) => {
           </div>
 
           {/* Hacienda API Configuration Section */}
-          <div className="p-4 md:p-8 border-b border-gray-100 bg-gray-50/50">
-            <h3 className="text-base md:text-lg font-bold text-gray-800 flex items-center gap-2 mb-4 md:mb-6">
-              <ShieldCheck className="text-gray-600" size={20} /> Facturación Electrónica (Modo Pruebas)
+          <div className="p-4 md:p-8 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
+            <h3 className="text-base md:text-lg font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2 mb-4 md:mb-6">
+              <ShieldCheck className="text-gray-600 dark:text-gray-400" size={20} /> Facturación Electrónica (Modo Pruebas)
             </h3>
-            <div className="mb-6 bg-white border border-gray-200 rounded-xl p-4 flex gap-3 items-start">
-                <AlertTriangle className="text-gray-600 min-w-[24px]" size={24} />
+            <div className="mb-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4 flex gap-3 items-start">
+                <AlertTriangle className="text-gray-600 dark:text-gray-400 min-w-[24px]" size={24} />
                 <div>
-                    <h4 className="font-bold text-gray-900 text-sm">Sistema en Sandbox (Staging)</h4>
-                    <p className="text-xs text-gray-600 mt-1">
+                    <h4 className="font-bold text-gray-900 dark:text-white text-sm">Sistema en Sandbox (Staging)</h4>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                         Esta aplicación está configurada exclusivamente para emitir documentos de prueba. 
                         <strong className="block mt-1">No se enviarán facturas reales a Hacienda Producción.</strong>
                     </p>
@@ -202,19 +202,19 @@ const Settings: React.FC<SettingsProps> = ({ settings, onSaveSettings }) => {
             <div className="grid grid-cols-1 gap-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">Ambiente</label>
-                  <div className="w-full p-3 border border-gray-200 bg-gray-100 rounded-xl text-gray-500 font-medium flex items-center justify-between cursor-not-allowed">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Ambiente</label>
+                  <div className="w-full p-3 border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 rounded-xl text-gray-500 dark:text-gray-400 font-medium flex items-center justify-between cursor-not-allowed">
                     <span>Sandbox / Pruebas</span>
                     <Lock size={14} />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">Usuario API (CPF-...)</label>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Usuario API (CPF-...)</label>
                   <input 
                     type="text" 
                     value={formData.hacienda?.username || ''} 
                     onChange={e => setFormData({...formData, hacienda: {...formData.hacienda!, username: e.target.value}})}
-                    className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all bg-white"
+                    className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all bg-white dark:bg-gray-900"
                     placeholder="cpf-01-1111-2222@staging.com"
                   />
                 </div>
@@ -222,19 +222,19 @@ const Settings: React.FC<SettingsProps> = ({ settings, onSaveSettings }) => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
-                   <label className="block text-sm font-semibold text-gray-700 flex items-center gap-1">
+                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1">
                       <Lock size={14} /> Contraseña API
                    </label>
                    <input 
                      type="password" 
                      value={formData.hacienda?.password || ''} 
                      onChange={e => setFormData({...formData, hacienda: {...formData.hacienda!, password: e.target.value}})}
-                     className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all bg-white"
+                     className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all bg-white dark:bg-gray-900"
                      placeholder="••••••••"
                    />
                 </div>
                 <div className="space-y-2">
-                   <label className="block text-sm font-semibold text-gray-700 flex items-center gap-1">
+                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1">
                       <FileKey size={14} /> PIN del Certificado
                    </label>
                    <input 
@@ -242,17 +242,17 @@ const Settings: React.FC<SettingsProps> = ({ settings, onSaveSettings }) => {
                      maxLength={4}
                      value={formData.hacienda?.pin || ''} 
                      onChange={e => setFormData({...formData, hacienda: {...formData.hacienda!, pin: e.target.value}})}
-                     className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all bg-white"
+                     className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all bg-white dark:bg-gray-900"
                      placeholder="••••"
                    />
                 </div>
                 <div className="space-y-2">
-                   <label className="block text-sm font-semibold text-gray-700 flex items-center gap-1">
+                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1">
                       <UploadCloud size={14} /> Llave Criptográfica (.p12)
                    </label>
-                   <div className={`relative w-full p-2.5 border border-dashed border-gray-300 rounded-xl bg-white flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors ${formData.hacienda?.certificateUploaded ? 'border-black bg-gray-50' : ''}`}>
+                   <div className={`relative w-full p-2.5 border border-dashed border-gray-300 rounded-xl bg-white dark:bg-gray-900 flex items-center justify-center cursor-pointer hover:bg-gray-50 dark:bg-gray-800 transition-colors ${formData.hacienda?.certificateUploaded ? 'border-black bg-gray-50 dark:bg-gray-800' : ''}`}>
                       <input type="file" accept=".p12" onChange={handleCertificateUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
-                      <span className={`text-sm font-medium ${formData.hacienda?.certificateUploaded ? 'text-black' : 'text-gray-500'}`}>
+                      <span className={`text-sm font-medium ${formData.hacienda?.certificateUploaded ? 'text-black' : 'text-gray-500 dark:text-gray-400'}`}>
                         {formData.hacienda?.certificateUploaded ? 'Certificado Cargado' : 'Seleccionar Archivo...'}
                       </span>
                    </div>
@@ -262,27 +262,27 @@ const Settings: React.FC<SettingsProps> = ({ settings, onSaveSettings }) => {
           </div>
 
           {/* Financial & Footer Section */}
-          <div className="p-4 md:p-8 bg-gray-50/30">
-            <h3 className="text-base md:text-lg font-bold text-gray-800 flex items-center gap-2 mb-4 md:mb-6">
+          <div className="p-4 md:p-8 bg-gray-50 dark:bg-gray-800/30">
+            <h3 className="text-base md:text-lg font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2 mb-4 md:mb-6">
               <Receipt className="text-black" size={20} /> Configuración de Factura y Moneda
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                    <Wallet size={14} /> Moneda Principal
                 </label>
                 <select 
                   required
                   value={formData.currency} 
                   onChange={e => setFormData({...formData, currency: e.target.value})}
-                  className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all bg-white"
+                  className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all bg-white dark:bg-gray-900"
                 >
                   <option value="CRC">Colones (₡)</option>
                   <option value="USD">Dólares ($)</option>
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                    <RefreshCw size={14} /> Tipo de Cambio (₡)
                 </label>
                 <input 
@@ -291,44 +291,44 @@ const Settings: React.FC<SettingsProps> = ({ settings, onSaveSettings }) => {
                   required
                   value={formData.exchangeRate || 520} 
                   onChange={e => setFormData({...formData, exchangeRate: parseFloat(e.target.value)})}
-                  className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all bg-white"
+                  className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all bg-white dark:bg-gray-900"
                   placeholder="Ej. 520"
                 />
               </div>
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">Impuesto IVA (%)</label>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Impuesto IVA (%)</label>
                 <input 
                   type="number" 
                   required
                   value={formData.taxRate} 
                   onChange={e => setFormData({...formData, taxRate: parseFloat(e.target.value)})}
-                  className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all bg-white"
+                  className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all bg-white dark:bg-gray-900"
                 />
               </div>
             </div>
             
             <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                    <MessageSquare size={14} /> Mensaje al Pie (Resolución Hacienda / Despedida)
                 </label>
                 <textarea 
                   rows={3}
                   value={formData.footerMessage || ''} 
                   onChange={e => setFormData({...formData, footerMessage: e.target.value})}
-                  className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all bg-white resize-none"
+                  className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all bg-white dark:bg-gray-900 resize-none"
                   placeholder="Ej. Autorizado mediante resolución... Gracias por su compra."
                 />
             </div>
           </div>
 
           {/* Footer Action */}
-          <div className="p-4 md:p-6 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sticky bottom-0 z-10">
-            <div className="text-xs md:text-sm text-gray-500">
+          <div className="p-4 md:p-6 bg-gray-50 dark:bg-gray-800 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sticky bottom-0 z-10">
+            <div className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
               {saved ? <span className="text-black font-bold animate-pulse flex items-center gap-1">Cambios guardados correctamente</span> : "Recuerda guardar tus cambios."}
             </div>
             <button 
               type="submit" 
-              className="w-full sm:w-auto bg-black text-white px-6 md:px-8 py-3 rounded-xl font-semibold hover:bg-gray-800 shadow-lg shadow-gray-200 flex items-center justify-center gap-2 transition-all active:scale-95 border border-black"
+              className="w-full sm:w-auto bg-black dark:bg-white text-white dark:text-black px-6 md:px-8 py-3 rounded-xl font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 shadow-lg shadow-gray-200 flex items-center justify-center gap-2 transition-all active:scale-95 border border-black dark:border-white"
             >
               <Save size={20} /> Guardar Configuración
             </button>

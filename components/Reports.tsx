@@ -1,7 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { Invoice, Expense, Product } from '../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
-import { Calendar, DollarSign, TrendingUp, TrendingDown, Activity, FileBarChart } from 'lucide-react';
+import { Calendar, DollarSign, TrendingUp, TrendingDown, Activity, FileBarChart, Download, FileSpreadsheet } from 'lucide-react';
+import { useOrganization } from '../contexts/OrganizationContext';
+import { exportReportsToPDF, exportReportsToExcel } from '../services/exportService';
 
 interface ReportsProps {
   invoices: Invoice[];
@@ -11,6 +13,7 @@ interface ReportsProps {
 
 const Reports: React.FC<ReportsProps> = ({ invoices, expenses, products }) => {
   const [dateRange, setDateRange] = useState('month'); // 'month', 'year', 'all'
+  const { organization } = useOrganization();
 
   // --- Helper Functions ---
   const filterByDate = (items: any[]) => {
@@ -72,48 +75,92 @@ const Reports: React.FC<ReportsProps> = ({ invoices, expenses, products }) => {
   // Grayscale Palette
   const COLORS = ['#000000', '#374151', '#6b7280', '#9ca3af', '#d1d5db', '#e5e7eb'];
 
+  const handleExportPDF = () => {
+    exportReportsToPDF({
+      dateRange: dateRange as 'month' | 'year' | 'all',
+      filteredInvoices,
+      filteredExpenses,
+      products,
+      productSales,
+      expenseCategories,
+      comparisonData,
+      totalSales,
+      totalExpenses,
+      netProfit,
+      profitMargin,
+      companyName: organization?.name,
+    });
+  };
+
+  const handleExportExcel = () => {
+    exportReportsToExcel({
+      dateRange: dateRange as 'month' | 'year' | 'all',
+      filteredInvoices,
+      filteredExpenses,
+      products,
+      productSales,
+      expenseCategories,
+      comparisonData,
+      totalSales,
+      totalExpenses,
+      netProfit,
+      profitMargin,
+      companyName: organization?.name,
+    });
+  };
+
   return (
     <div className="space-y-6 md:space-y-8 animate-fade-in pb-20 md:pb-10">
-       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Reportes Financieros</h2>
-          <p className="text-gray-500 mt-1 text-sm md:text-base">Análisis detallado del rendimiento del negocio</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Reportes Financieros</h2>
+          <p className="text-gray-500 dark:text-gray-400 dark:text-gray-400 mt-1 text-sm md:text-base">Análisis detallado del rendimiento del negocio</p>
         </div>
         
-        <div className="flex bg-white p-1 rounded-xl border border-gray-200 shadow-sm w-full md:w-auto">
-           <button onClick={() => setDateRange('month')} className={`flex-1 md:flex-none px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${dateRange === 'month' ? 'bg-gray-100 text-black' : 'text-gray-500 hover:text-gray-900'}`}>Este Mes</button>
-           <button onClick={() => setDateRange('year')} className={`flex-1 md:flex-none px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${dateRange === 'year' ? 'bg-gray-100 text-black' : 'text-gray-500 hover:text-gray-900'}`}>Este Año</button>
-           <button onClick={() => setDateRange('all')} className={`flex-1 md:flex-none px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${dateRange === 'all' ? 'bg-gray-100 text-black' : 'text-gray-500 hover:text-gray-900'}`}>Todo</button>
+        <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+          <div className="flex bg-white dark:bg-gray-900 p-1 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex-1 sm:flex-none">
+             <button onClick={() => setDateRange('month')} className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${dateRange === 'month' ? 'bg-gray-100 dark:bg-gray-800 text-black' : 'text-gray-500 dark:text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:text-white'}`}>Este Mes</button>
+             <button onClick={() => setDateRange('year')} className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${dateRange === 'year' ? 'bg-gray-100 dark:bg-gray-800 text-black' : 'text-gray-500 dark:text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:text-white'}`}>Este Año</button>
+             <button onClick={() => setDateRange('all')} className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${dateRange === 'all' ? 'bg-gray-100 dark:bg-gray-800 text-black' : 'text-gray-500 dark:text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:text-white'}`}>Todo</button>
+          </div>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <button onClick={handleExportPDF} className="flex-1 sm:flex-none bg-black dark:bg-white text-white dark:text-black px-4 sm:px-5 py-2.5 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 flex justify-center items-center gap-2 shadow-lg shadow-gray-200 transition-all active:scale-95 border border-black dark:border-white text-xs sm:text-sm font-semibold">
+              <Download size={16} /> Exportar PDF
+            </button>
+            <button onClick={handleExportExcel} className="flex-1 sm:flex-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-4 sm:px-5 py-2.5 rounded-xl hover:bg-gray-50 dark:bg-gray-800 flex justify-center items-center gap-2 shadow-sm border border-gray-200 dark:border-gray-700 transition-all active:scale-95 text-xs sm:text-sm font-semibold">
+              <FileSpreadsheet size={16} /> Exportar Excel
+            </button>
+          </div>
         </div>
-      </div>
+       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-         <div className="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden group">
+         <div className="bg-white dark:bg-gray-900 p-5 md:p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 relative overflow-hidden group">
             <div className="absolute right-0 top-0 p-4 opacity-5 group-hover:scale-110 transition-transform"><TrendingUp size={64} className="text-black"/></div>
-            <p className="text-xs md:text-sm font-bold text-gray-500 uppercase tracking-wide mb-2 truncate">Ventas Totales</p>
-            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 truncate">₡ {totalSales.toLocaleString(undefined, {maximumFractionDigits: 0})}</h3>
-            <p className="text-xs text-gray-400 mt-2 flex items-center gap-1"><Calendar size={12}/> {filteredInvoices.length} facturas emitidas</p>
+            <p className="text-xs md:text-sm font-bold text-gray-500 dark:text-gray-400 dark:text-gray-400 uppercase tracking-wide mb-2 truncate">Ventas Totales</p>
+            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white truncate">₡ {totalSales.toLocaleString(undefined, {maximumFractionDigits: 0})}</h3>
+            <p className="text-xs text-gray-400 dark:text-gray-400 mt-2 flex items-center gap-1"><Calendar size={12}/> {filteredInvoices.length} facturas emitidas</p>
          </div>
 
-         <div className="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden group">
-            <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:scale-110 transition-transform"><TrendingDown size={64} className="text-gray-400"/></div>
-            <p className="text-xs md:text-sm font-bold text-gray-500 uppercase tracking-wide mb-2 truncate">Gastos Totales</p>
-            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 truncate">₡ {totalExpenses.toLocaleString(undefined, {maximumFractionDigits: 0})}</h3>
-            <p className="text-xs text-gray-400 mt-2 flex items-center gap-1"><Activity size={12}/> {filteredExpenses.length} movimientos registrados</p>
+         <div className="bg-white dark:bg-gray-900 p-5 md:p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 relative overflow-hidden group">
+            <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:scale-110 transition-transform"><TrendingDown size={64} className="text-gray-400 dark:text-gray-400"/></div>
+            <p className="text-xs md:text-sm font-bold text-gray-500 dark:text-gray-400 dark:text-gray-400 uppercase tracking-wide mb-2 truncate">Gastos Totales</p>
+            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white truncate">₡ {totalExpenses.toLocaleString(undefined, {maximumFractionDigits: 0})}</h3>
+            <p className="text-xs text-gray-400 dark:text-gray-400 mt-2 flex items-center gap-1"><Activity size={12}/> {filteredExpenses.length} movimientos registrados</p>
          </div>
 
-         <div className={`bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden group sm:col-span-2 md:col-span-1`}>
+         <div className={`bg-white dark:bg-gray-900 p-5 md:p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 relative overflow-hidden group sm:col-span-2 md:col-span-1`}>
             <div className={`absolute right-0 top-0 p-4 opacity-10 group-hover:scale-110 transition-transform`}>
-                <DollarSign size={64} className="text-gray-900"/>
+                <DollarSign size={64} className="text-gray-900 dark:text-white"/>
             </div>
-            <p className={`text-xs md:text-sm font-bold uppercase tracking-wide mb-2 text-gray-500`}>
+            <p className={`text-xs md:text-sm font-bold uppercase tracking-wide mb-2 text-gray-500 dark:text-gray-400 dark:text-gray-400`}>
                 Utilidad Neta
             </p>
-            <h3 className={`text-2xl md:text-3xl font-bold text-gray-900 truncate`}>
+            <h3 className={`text-2xl md:text-3xl font-bold text-gray-900 dark:text-white truncate`}>
                 ₡ {netProfit.toLocaleString(undefined, {maximumFractionDigits: 0})}
             </h3>
-            <p className={`text-xs font-bold mt-2 px-2 py-0.5 rounded w-fit border ${profitMargin > 0 ? 'bg-black text-white border-black' : 'bg-white text-gray-500 border-gray-300'}`}>
+            <p className={`text-xs font-bold mt-2 px-2 py-0.5 rounded w-fit border ${profitMargin > 0 ? 'bg-black dark:bg-white text-white dark:text-black border-black' : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 dark:text-gray-400 border-gray-300'}`}>
                Margen: {profitMargin.toFixed(1)}%
             </p>
          </div>
@@ -121,8 +168,8 @@ const Reports: React.FC<ReportsProps> = ({ invoices, expenses, products }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
         {/* Chart: Income vs Expenses */}
-        <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-200">
-            <h3 className="text-base md:text-lg font-bold text-gray-800 mb-4 md:mb-6">Flujo de Caja</h3>
+        <div className="bg-white dark:bg-gray-900 p-4 md:p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <h3 className="text-base md:text-lg font-bold text-gray-800 dark:text-gray-200 mb-4 md:mb-6">Flujo de Caja</h3>
             <div className="h-64 md:h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={comparisonData} layout="vertical">
@@ -141,8 +188,8 @@ const Reports: React.FC<ReportsProps> = ({ invoices, expenses, products }) => {
         </div>
 
         {/* Chart: Expense Distribution */}
-        <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-200 flex flex-col">
-             <h3 className="text-base md:text-lg font-bold text-gray-800 mb-2">Distribución de Gastos</h3>
+        <div className="bg-white dark:bg-gray-900 p-4 md:p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col">
+             <h3 className="text-base md:text-lg font-bold text-gray-800 dark:text-gray-200 mb-2">Distribución de Gastos</h3>
              <div className="flex-1 min-h-[260px] md:min-h-[300px]">
                  {expenseCategories.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
@@ -165,48 +212,48 @@ const Reports: React.FC<ReportsProps> = ({ invoices, expenses, products }) => {
                         </PieChart>
                     </ResponsiveContainer>
                  ) : (
-                    <div className="h-full flex items-center justify-center text-gray-400 bg-gray-50 rounded-xl">Sin datos de gastos</div>
+                    <div className="h-full flex items-center justify-center text-gray-400 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl">Sin datos de gastos</div>
                  )}
              </div>
         </div>
       </div>
 
       {/* Top Products Table */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="p-4 md:p-6 border-b border-gray-100 flex items-center justify-between">
-             <h3 className="text-base md:text-lg font-bold text-gray-800">Productos Más Vendidos</h3>
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="p-4 md:p-6 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+             <h3 className="text-base md:text-lg font-bold text-gray-800 dark:text-gray-200">Productos Más Vendidos</h3>
              <FileBarChart size={20} className="text-black flex-shrink-0"/>
           </div>
           <div className="overflow-x-auto">
           <table className="w-full text-left text-sm min-w-[400px]">
-              <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+              <thead className="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 dark:text-gray-400 uppercase text-xs">
                   <tr>
                       <th className="px-6 py-3 font-semibold">Producto</th>
                       <th className="px-6 py-3 font-semibold text-right">Unidades Vendidas</th>
                       <th className="px-6 py-3 font-semibold text-right">Participación</th>
                   </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                   {productSales.map((item, idx) => (
-                      <tr key={idx} className="hover:bg-gray-50/50">
-                          <td className="px-6 py-3 font-medium text-gray-700">
+                      <tr key={idx} className="hover:bg-gray-50 dark:bg-gray-800/50">
+                          <td className="px-6 py-3 font-medium text-gray-700 dark:text-gray-300">
                               <div className="flex items-center gap-2">
-                                  <span className="w-6 h-6 rounded-full bg-gray-100 text-black flex items-center justify-center text-xs font-bold border border-gray-200">
+                                  <span className="w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-800 text-black flex items-center justify-center text-xs font-bold border border-gray-200 dark:border-gray-700">
                                       {idx + 1}
                                   </span>
                                   {item.name}
                               </div>
                           </td>
-                          <td className="px-6 py-3 text-right font-bold text-gray-900">{item.qty}</td>
+                          <td className="px-6 py-3 text-right font-bold text-gray-900 dark:text-white">{item.qty}</td>
                           <td className="px-6 py-3 text-right">
-                             <div className="w-full bg-gray-100 rounded-full h-1.5 mt-1 max-w-[100px] ml-auto">
-                                <div className="bg-black h-1.5 rounded-full" style={{width: `${(item.qty / productSales[0].qty) * 100}%`}}></div>
+                             <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-1.5 mt-1 max-w-[100px] ml-auto">
+                                <div className="bg-black dark:bg-white h-1.5 rounded-full" style={{width: `${(item.qty / productSales[0].qty) * 100}%`}}></div>
                              </div>
                           </td>
                       </tr>
                   ))}
                   {productSales.length === 0 && (
-                      <tr><td colSpan={3} className="text-center py-8 text-gray-400">No hay datos de ventas</td></tr>
+                      <tr><td colSpan={3} className="text-center py-8 text-gray-400 dark:text-gray-400">No hay datos de ventas</td></tr>
                   )}
               </tbody>
           </table>

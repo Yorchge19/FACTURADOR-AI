@@ -7,7 +7,8 @@ import Workspace from './components/Workspace';
 import OrganizationSetup from './components/OrganizationSetup';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { OrganizationProvider } from './contexts/OrganizationContext';
-import { LayoutDashboard } from 'lucide-react';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { LayoutDashboard, WifiOff } from 'lucide-react';
 
 /* ── Splash ──────────────────────────────────────────────────────────── */
 const LoadingScreen: React.FC = () => (
@@ -83,13 +84,37 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+/* ── Offline banner (PWA shell offline) ───────────────────────────────── */
+const OfflineBanner: React.FC = () => {
+  const [isOnline, setIsOnline] = React.useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
+  React.useEffect(() => {
+    const onOnline = () => setIsOnline(true);
+    const onOffline = () => setIsOnline(false);
+    window.addEventListener('online', onOnline);
+    window.addEventListener('offline', onOffline);
+    return () => {
+      window.removeEventListener('online', onOnline);
+      window.removeEventListener('offline', onOffline);
+    };
+  }, []);
+  if (isOnline) return null;
+  return (
+    <div className="fixed top-0 inset-x-0 z-[9999] bg-amber-400 text-black text-xs sm:text-sm font-bold px-4 py-2.5 flex items-center justify-center gap-2 shadow-md">
+      <WifiOff size={16} className="flex-shrink-0" />
+      <span>Sin conexión — la interfaz sigue disponible en modo offline. Los datos se sincronizarán al reconectar.</span>
+    </div>
+  );
+};
+
 /* ── App Routes ──────────────────────────────────────────────────────── */
 const AppRoutes: React.FC = () => {
   const { loading } = useAuth();
   if (loading) return <LoadingScreen />;
 
   return (
-    <Routes>
+    <>
+      <OfflineBanner />
+      <Routes>
       <Route path="/" element={<PublicRoute><LandingDashboard /></PublicRoute>} />
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
 
@@ -115,15 +140,18 @@ const AppRoutes: React.FC = () => {
         }
       />
     </Routes>
+    </>
   );
 };
 
 const App: React.FC = () => (
-  <AuthProvider>
-    <Router>
-      <AppRoutes />
-    </Router>
-  </AuthProvider>
+  <ThemeProvider>
+    <AuthProvider>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </AuthProvider>
+  </ThemeProvider>
 );
 
 export default App;

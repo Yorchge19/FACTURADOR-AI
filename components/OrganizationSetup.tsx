@@ -137,7 +137,7 @@ const OrganizationSetup: React.FC = () => {
           </div>
           <div className="text-left min-w-0">
             <h1 className="text-lg sm:text-xl font-black text-white truncate">Facturador AI</h1>
-            <p className="text-gray-600 text-xs">Configuración inicial</p>
+            <p className="text-gray-600 dark:text-gray-400 text-xs">Configuración inicial</p>
           </div>
         </div>
 
@@ -146,7 +146,7 @@ const OrganizationSetup: React.FC = () => {
           <div className="space-y-4">
             <div className="text-center mb-6 sm:mb-8 px-2">
               <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">Bienvenido</h2>
-              <p className="text-gray-400 text-sm break-words">
+              <p className="text-gray-400 dark:text-gray-500 text-sm break-words">
                 Hola, <span className="text-white font-semibold break-all">{email}</span>.<br />
                 Para continuar, crea una organización o únete a una existente.
               </p>
@@ -154,16 +154,16 @@ const OrganizationSetup: React.FC = () => {
 
             <button
               onClick={() => setStep('create')}
-              className="w-full group relative overflow-hidden bg-white text-black rounded-2xl p-4 sm:p-5 flex items-center gap-3 sm:gap-4 font-bold hover:bg-gray-100 transition-all shadow-xl"
+              className="w-full group relative overflow-hidden bg-white text-black rounded-2xl p-4 sm:p-5 flex items-center gap-3 sm:gap-4 font-bold hover:bg-gray-100 dark:bg-gray-800 transition-all shadow-xl"
             >
               <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-black flex items-center justify-center flex-shrink-0 shadow-inner">
                 <Building2 size={20} className="text-white sm:h-[22px] sm:w-[22px]" />
               </div>
               <div className="text-left flex-1 min-w-0">
                 <p className="font-black text-base sm:text-lg truncate">Crear una organización</p>
-                <p className="text-gray-500 font-normal text-xs sm:text-sm truncate">Soy dueño de un negocio</p>
+                <p className="text-gray-500 dark:text-gray-400 font-normal text-xs sm:text-sm truncate">Soy dueño de un negocio</p>
               </div>
-              <ChevronRight size={20} className="text-gray-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+              <ChevronRight size={20} className="text-gray-400 dark:text-gray-500 group-hover:translate-x-1 transition-transform flex-shrink-0" />
             </button>
 
             <button
@@ -175,14 +175,14 @@ const OrganizationSetup: React.FC = () => {
               </div>
               <div className="text-left flex-1 min-w-0">
                 <p className="font-black text-base sm:text-lg truncate">Unirme con un código</p>
-                <p className="text-gray-500 font-normal text-xs sm:text-sm truncate">Tengo un código de invitación</p>
+                <p className="text-gray-500 dark:text-gray-400 font-normal text-xs sm:text-sm truncate">Tengo un código de invitación</p>
               </div>
-              <ChevronRight size={20} className="text-gray-500 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+              <ChevronRight size={20} className="text-gray-500 dark:text-gray-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
             </button>
 
             <button
               onClick={logout}
-              className="w-full mt-4 flex items-center justify-center gap-2 text-gray-600 hover:text-gray-400 text-sm py-3 transition-colors"
+              className="w-full mt-4 flex items-center justify-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-400 dark:text-gray-500 text-sm py-3 transition-colors"
             >
               <LogOut size={15} /> Cerrar sesión
             </button>
@@ -193,7 +193,7 @@ const OrganizationSetup: React.FC = () => {
         {step === 'create' && (
           <div>
             <button onClick={() => { setStep('choose'); setError(''); }}
-              className="flex items-center gap-2 text-gray-500 hover:text-white text-sm mb-8 transition-colors">
+              className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-white text-sm mb-8 transition-colors">
               <ArrowLeft size={15} /> Volver
             </button>
             <div className="bg-white/[0.04] border border-white/10 rounded-3xl p-5 sm:p-8">
@@ -203,13 +203,13 @@ const OrganizationSetup: React.FC = () => {
                 </div>
                 <div className="min-w-0">
                   <h2 className="text-lg sm:text-xl font-black text-white">Nueva Organización</h2>
-                  <p className="text-gray-500 text-xs">Serás el administrador (owner)</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs">Serás el administrador (owner)</p>
                 </div>
               </div>
 
               <form onSubmit={handleCreateOrg} className="space-y-5">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-400 mb-2">
+                  <label className="block text-sm font-semibold text-gray-400 dark:text-gray-500 mb-2">
                     Nombre de la empresa
                   </label>
                   <input
@@ -231,7 +231,7 @@ const OrganizationSetup: React.FC = () => {
                 )}
 
                 <button type="submit" disabled={loading}
-                  className="w-full bg-white text-black py-3.5 rounded-xl font-bold hover:bg-gray-100 transition-all flex items-center justify-center gap-2 disabled:opacity-60 shadow-lg">
+                  className="w-full bg-white text-black py-3.5 rounded-xl font-bold hover:bg-gray-100 dark:bg-gray-800 transition-all flex items-center justify-center gap-2 disabled:opacity-60 shadow-lg">
                   {loading
                     ? <><Loader2 size={18} className="animate-spin" /> Creando…</>
                     : <><Plus size={18} /> Crear Organización</>
@@ -246,7 +246,7 @@ const OrganizationSetup: React.FC = () => {
         {step === 'join' && (
           <div>
             <button onClick={() => { setStep('choose'); setError(''); setSuccess(''); }}
-              className="flex items-center gap-2 text-gray-500 hover:text-white text-sm mb-8 transition-colors">
+              className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-white text-sm mb-8 transition-colors">
               <ArrowLeft size={15} /> Volver
             </button>
             <div className="bg-white/[0.04] border border-white/10 rounded-3xl p-5 sm:p-8">
@@ -256,13 +256,13 @@ const OrganizationSetup: React.FC = () => {
                 </div>
                 <div className="min-w-0">
                   <h2 className="text-lg sm:text-xl font-black text-white">Unirse con Código</h2>
-                  <p className="text-gray-500 text-xs">Solicita el código al administrador</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs">Solicita el código al administrador</p>
                 </div>
               </div>
 
               <form onSubmit={handleJoinOrg} className="space-y-5">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-400 mb-2">
+                  <label className="block text-sm font-semibold text-gray-400 dark:text-gray-500 mb-2">
                     Código de invitación
                   </label>
                   <input
@@ -289,7 +289,7 @@ const OrganizationSetup: React.FC = () => {
                 )}
 
                 <button type="submit" disabled={loading}
-                  className="w-full bg-white text-black py-3.5 rounded-xl font-bold hover:bg-gray-100 transition-all flex items-center justify-center gap-2 disabled:opacity-60 shadow-lg">
+                  className="w-full bg-white text-black py-3.5 rounded-xl font-bold hover:bg-gray-100 dark:bg-gray-800 transition-all flex items-center justify-center gap-2 disabled:opacity-60 shadow-lg">
                   {loading
                     ? <><Loader2 size={18} className="animate-spin" /> Verificando…</>
                     : <><Users size={18} /> Unirse a la Organización</>

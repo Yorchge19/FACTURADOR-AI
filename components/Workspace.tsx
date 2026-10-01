@@ -14,10 +14,17 @@ import Reports from './Reports';
 import CierreCaja from './CierreCaja';
 import UserManagement from './UserManagement';
 import InventoryCount from './InventoryCount';
+import QuoteForm from './QuoteForm';
+import QuoteList from './QuoteList';
+import LabOrderForm from './LabOrderForm';
+import LabOrderList from './LabOrderList';
+import Goals from './Goals';
+import LensSimulation from './LensSimulation';
+import GlobalSearch from './GlobalSearch';
 import { useAuth } from '../contexts/AuthContext';
 import { useOrganization } from '../contexts/OrganizationContext';
 import { StorageService } from '../services/storageService';
-import { Product, Customer, Invoice, AppSettings, Expense, Payment, Permission, InventoryAudit } from '../types';
+import { Product, Customer, Invoice, AppSettings, Expense, Payment, Permission, InventoryAudit, Quote, LabOrder, DailyEntry } from '../types';
 import { Sparkles, Lock } from 'lucide-react';
 
 /* ── Premium loading screen ──────────────────────────────────────────── */
@@ -93,9 +100,24 @@ const Workspace: React.FC = () => {
   const [invoices,  setInvoices]  = useState<Invoice[]>([]);
   const [expenses,  setExpenses]  = useState<Expense[]>([]);
   const [inventoryAudits, setInventoryAudits] = useState<InventoryAudit[]>([]);
+  const [quotes, setQuotes] = useState<Quote[]>([]);
+  const [labOrders, setLabOrders] = useState<LabOrder[]>([]);
+  const [dailyEntries, setDailyEntries] = useState<DailyEntry[]>([]);
   const [settings,  setSettings]  = useState<AppSettings>({
     companyName: '', companyTaxId: '', currency: '', taxRate: 0, address: '', exchangeRate: 520,
   });
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -110,13 +132,16 @@ const Workspace: React.FC = () => {
       try {
         setLoadingData(true);
         const effectiveOrgId = orgId ?? undefined;
-        const [prodData, custData, invData, expData, settData, auditsData] = await Promise.all([
+        const [prodData, custData, invData, expData, settData, auditsData, quotesData, labOrdersData, entriesData] = await Promise.all([
           StorageService.getProducts(effectiveOrgId).catch(() => [] as Product[]),
           StorageService.getCustomers(effectiveOrgId).catch(() => [] as Customer[]),
           StorageService.getInvoices(effectiveOrgId).catch(() => [] as Invoice[]),
           StorageService.getExpenses(effectiveOrgId).catch(() => [] as Expense[]),
           StorageService.getSettings(effectiveOrgId).catch(() => ({ companyName: '', companyTaxId: '', currency: 'CRC', taxRate: 13, address: '', exchangeRate: 520 } as AppSettings)),
           StorageService.getInventoryAudits(effectiveOrgId).catch(() => [] as InventoryAudit[]),
+          StorageService.getQuotes(effectiveOrgId).catch(() => [] as Quote[]),
+          StorageService.getLabOrders(effectiveOrgId).catch(() => [] as LabOrder[]),
+          StorageService.getDailyEntries(effectiveOrgId).catch(() => [] as DailyEntry[]),
         ]);
         setProducts(prodData);
         setCustomers(custData);
@@ -124,6 +149,9 @@ const Workspace: React.FC = () => {
         setExpenses(expData);
         setSettings(settData);
         setInventoryAudits(auditsData);
+        setQuotes(quotesData);
+        setLabOrders(labOrdersData);
+        setDailyEntries(entriesData);
         // Si no hay productos y estamos en modo demo/localStorage, sembrar datos de ejemplo
         if (prodData.length === 0) {
           try {
@@ -231,6 +259,31 @@ const Workspace: React.FC = () => {
     setInventoryAudits(prev => [audit, ...prev]);
     await StorageService.saveInventoryAudit(audit, orgId ?? undefined);
   };
+  const handleSaveQuote = async (quote: Quote) => {
+    setQuotes(prev => [quote, ...prev]);
+    await StorageService.saveQuote(quote, orgId ?? undefined);
+  };
+  const handleUpdateQuoteStatus = async (quoteId: string, status: Quote['status'], convertedInvoiceId?: string) => {
+    setQuotes(prev => prev.map(q => q.id === quoteId ? { ...q, status, convertedInvoiceId: convertedInvoiceId ?? q.convertedInvoiceId } : q));
+    await StorageService.updateQuoteStatus(quoteId, status, orgId ?? undefined, convertedInvoiceId);
+  };
+  const handleSaveLabOrder = async (order: LabOrder) => {
+    setLabOrders(prev => [order, ...prev]);
+    await StorageService.saveLabOrder(order, orgId ?? undefined);
+  };
+  const handleUpdateLabOrderStatus = async (orderId: string, status: LabOrder['status']) => {
+    setLabOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
+    await StorageService.updateLabOrderStatus(orderId, status, orgId ?? undefined);
+  };
+  const handleSaveDailyEntry = async (entry: DailyEntry) => {
+    setDailyEntries(prev => [entry, ...prev]);
+    await StorageService.saveDailyEntry(entry, orgId ?? undefined);
+  };
+  const handleDeleteDailyEntry = async (id: string) => {
+    if (!confirm('¿Eliminar este registro diario?')) return;
+    setDailyEntries(prev => prev.filter(e => e.id !== id));
+    await StorageService.deleteDailyEntry(id, orgId ?? undefined);
+  };
   const handleSaveSettings = async (s: AppSettings) => {
     setSettings(s);
     await StorageService.saveSettings(s, orgId ?? undefined);
@@ -238,7 +291,7 @@ const Workspace: React.FC = () => {
   const handleUpdateStock = (_productId: string, _qty: number) => {};
 
   return (
-    <Layout>
+    <Layout products={products} invoices={invoices} onSearchOpen={() => setSearchOpen(true)}>
       <Routes>
         <Route path="/" element={
           <PermGuard perm="view_dashboard">
@@ -272,6 +325,36 @@ const Workspace: React.FC = () => {
               onCreateInvoice={handleCreateInvoice} onUpdateStock={handleUpdateStock} />
           </PermGuard>
         } />
+        <Route path="/quotes" element={
+          <PermGuard perm="manage_quotes">
+            <QuoteList quotes={quotes} onUpdateStatus={handleUpdateQuoteStatus} settings={settings} />
+          </PermGuard>
+        } />
+        <Route path="/create-quote" element={
+          <PermGuard perm="manage_quotes">
+            <QuoteForm products={products} customers={customers} settings={settings} onSaveQuote={handleSaveQuote} />
+          </PermGuard>
+        } />
+        <Route path="/lab-orders" element={
+          <PermGuard perm="manage_lab_orders">
+            <LabOrderList labOrders={labOrders} onUpdateStatus={handleUpdateLabOrderStatus} settings={settings} />
+          </PermGuard>
+        } />
+        <Route path="/create-lab-order" element={
+          <PermGuard perm="manage_lab_orders">
+            <LabOrderForm products={products} customers={customers} quotes={quotes} invoices={invoices} settings={settings} onSaveLabOrder={handleSaveLabOrder} />
+          </PermGuard>
+        } />
+        <Route path="/goals" element={
+          <PermGuard perm="manage_goals">
+            <Goals entries={dailyEntries} settings={settings} onSaveEntry={handleSaveDailyEntry} onDeleteEntry={handleDeleteDailyEntry} onSaveSettings={handleSaveSettings} />
+          </PermGuard>
+        } />
+        <Route path="/lens-simulation" element={
+          <PermGuard perm="use_lens_simulation">
+            <LensSimulation products={products} settings={settings} onSaveSettings={handleSaveSettings} />
+          </PermGuard>
+        } />
         <Route path="/create-receipt" element={
           <PermGuard perm="create_invoices">
             <ReceiptForm invoices={invoices} onAddPayment={handleAddPayment} />
@@ -302,6 +385,13 @@ const Workspace: React.FC = () => {
           <Route path="/users" element={<UserManagement />} />
         )}
       </Routes>
+      <GlobalSearch
+        isOpen={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        products={products}
+        customers={customers}
+        invoices={invoices}
+      />
     </Layout>
   );
 };

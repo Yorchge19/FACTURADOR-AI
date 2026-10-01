@@ -166,22 +166,22 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <span className="h-10 w-10 rounded-xl bg-black flex items-center justify-center shadow-sm">
-              <ClipboardList size={20} className="text-white" />
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+            <span className="h-10 w-10 rounded-xl bg-black dark:bg-white flex items-center justify-center shadow-sm">
+              <ClipboardList size={20} className="text-white dark:text-black" />
             </span>
             Tomas de Inventario
           </h2>
-          <p className="text-gray-500 mt-1 text-sm md:text-base">Auditoría física de stock — escanea o busca productos y compara con el sistema</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm md:text-base">Auditoría física de stock — escanea o busca productos y compara con el sistema</p>
         </div>
         <div className="flex gap-2 w-full md:w-auto">
           <button
             onClick={() => setShowHistory(!showHistory)}
-            className={`flex-1 md:flex-none px-4 py-2.5 rounded-xl border flex items-center justify-center gap-2 text-sm font-medium transition-all ${showHistory ? 'bg-black text-white border-black' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}
+            className={`flex-1 md:flex-none px-4 py-2.5 rounded-xl border flex items-center justify-center gap-2 text-sm font-medium transition-all ${showHistory ? 'bg-black dark:bg-white text-white dark:text-black border-black' : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:bg-gray-800'}`}
           >
             <History size={16} /> {showHistory ? 'Ocultar historial' : 'Ver historial'}
             {audits.length > 0 && !showHistory && (
-              <span className="ml-1 bg-black text-white text-[10px] px-1.5 py-0.5 rounded-full">{audits.length}</span>
+              <span className="ml-1 bg-black dark:bg-white text-white dark:text-black text-[10px] px-1.5 py-0.5 rounded-full">{audits.length}</span>
             )}
           </button>
         </div>
@@ -190,16 +190,16 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
       {/* Stats summary when counting */}
       {countedItems.length > 0 && !auditPreview && (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <div className="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-200">
-            <p className="text-xs text-gray-500 font-bold uppercase tracking-wide">Productos contados</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1">{countedItems.length} <span className="text-sm font-normal text-gray-400">/ {products.length}</span></p>
+          <div className="bg-white dark:bg-gray-900 p-4 md:p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wide">Productos contados</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{countedItems.length} <span className="text-sm font-normal text-gray-400 dark:text-gray-500">/ {products.length}</span></p>
           </div>
-          <div className="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-200">
-            <p className="text-xs text-gray-500 font-bold uppercase tracking-wide">Unidades contadas</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1">{totalCountedUnits}</p>
+          <div className="bg-white dark:bg-gray-900 p-4 md:p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wide">Unidades contadas</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{totalCountedUnits}</p>
           </div>
-          <div className="hidden md:block bg-black p-4 md:p-5 rounded-2xl shadow-sm border border-black text-white">
-            <p className="text-xs text-gray-400 font-bold uppercase tracking-wide">Modo auditoría</p>
+          <div className="hidden md:block bg-black dark:bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-black text-white dark:text-black">
+            <p className="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wide">Modo auditoría</p>
             <p className="text-sm font-medium mt-1 text-gray-200">No modifica el stock automáticamente</p>
           </div>
         </div>
@@ -207,28 +207,28 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
 
       {/* History Section */}
       {showHistory && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-4 md:px-6 py-4 border-b border-gray-100 flex items-center gap-2">
-            <History size={18} className="text-gray-700" />
-            <h3 className="font-bold text-gray-900">Historial de auditorías</h3>
-            <span className="ml-auto text-xs text-gray-500">{audits.length} registro(s)</span>
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="px-4 md:px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-2">
+            <History size={18} className="text-gray-700 dark:text-gray-300" />
+            <h3 className="font-bold text-gray-900 dark:text-white">Historial de auditorías</h3>
+            <span className="ml-auto text-xs text-gray-500 dark:text-gray-400">{audits.length} registro(s)</span>
           </div>
           {audits.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-10 text-gray-400">
+            <div className="flex flex-col items-center justify-center py-10 text-gray-400 dark:text-gray-500">
               <ClipboardCheck size={40} className="opacity-20 mb-2" />
               <p className="text-sm font-medium">No hay auditorías guardadas</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-gray-100 dark:divide-gray-800">
               {audits.map(audit => {
                 const expanded = expandedAuditId === audit.id;
                 return (
-                  <div key={audit.id} className="px-4 md:px-6 py-4 hover:bg-gray-50 transition-colors">
+                  <div key={audit.id} className="px-4 md:px-6 py-4 hover:bg-gray-50 dark:bg-gray-800 transition-colors">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-gray-900">
+                        <p className="text-sm font-bold text-gray-900 dark:text-white">
                           {new Date(audit.date).toLocaleDateString('es-CR')} {new Date(audit.date).toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' })}
-                          {audit.userName && <span className="font-normal text-gray-500"> · {audit.userName}</span>}
+                          {audit.userName && <span className="font-normal text-gray-500 dark:text-gray-400"> · {audit.userName}</span>}
                         </p>
                         <div className="flex flex-wrap gap-2 mt-1.5">
                           <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-200 font-semibold">
@@ -244,7 +244,7 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
                       </div>
                       <button
                         onClick={() => setExpandedAuditId(expanded ? null : audit.id)}
-                        className="self-start md:self-auto px-3 py-1.5 text-xs font-semibold border border-gray-200 rounded-lg hover:bg-white bg-gray-50 text-gray-700"
+                        className="self-start md:self-auto px-3 py-1.5 text-xs font-semibold border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-white dark:bg-gray-900 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
                       >
                         {expanded ? 'Ocultar detalle' : 'Ver detalle'}
                       </button>
@@ -299,9 +299,9 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
       )}
 
       {/* Search Bar */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
         <div className="relative" ref={searchRef}>
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
           <input
             type="text"
             placeholder="Buscar por SKU o nombre del producto... (Enter para agregar si hay coincidencia exacta)"
@@ -309,21 +309,21 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
             onChange={(e) => { setSearchTerm(e.target.value); setIsDropdownOpen(true); }}
             onFocus={() => setIsDropdownOpen(true)}
             onKeyDown={handleSearchKeyDown}
-            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none text-sm transition-all"
+            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black focus:border-black dark:border-white outline-none text-sm transition-all"
           />
           {isDropdownOpen && filteredSuggestions.length > 0 && (
-            <div className="absolute z-20 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden max-h-64 overflow-y-auto">
+            <div className="absolute z-20 mt-2 w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden max-h-64 overflow-y-auto">
               {filteredSuggestions.map(p => (
                 <button
                   key={p.id}
                   onClick={() => handleAddProduct(p)}
-                  className="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center justify-between gap-3 border-b border-gray-50 last:border-0 transition-colors"
+                  className="w-full text-left px-4 py-2.5 hover:bg-gray-50 dark:bg-gray-800 flex items-center justify-between gap-3 border-b border-gray-50 last:border-0 transition-colors"
                 >
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 truncate">{p.name}</p>
-                    <p className="text-xs text-gray-500 font-mono">{p.sku} · Stock sistema: {p.stock}</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{p.name}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">{p.sku} · Stock sistema: {p.stock}</p>
                   </div>
-                  <span className="flex-shrink-0 h-7 w-7 rounded-lg bg-black text-white flex items-center justify-center">
+                  <span className="flex-shrink-0 h-7 w-7 rounded-lg bg-black dark:bg-white text-white dark:text-black flex items-center justify-center">
                     <Plus size={14} />
                   </span>
                 </button>
@@ -331,22 +331,22 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
             </div>
           )}
         </div>
-        <p className="text-xs text-gray-400 mt-2">Tip: puedes escanear el mismo código varias veces para incrementar la cantidad.</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">Tip: puedes escanear el mismo código varias veces para incrementar la cantidad.</p>
       </div>
 
       {/* Current Count List */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-4 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h3 className="font-bold text-gray-900 flex items-center gap-2">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="px-4 md:px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+          <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Package size={18} /> Conteo actual
             {countedItems.length > 0 && (
-              <span className="ml-1 text-xs font-normal bg-gray-100 border border-gray-200 px-2 py-0.5 rounded-full text-gray-600">{countedItems.length} ítems</span>
+              <span className="ml-1 text-xs font-normal bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-0.5 rounded-full text-gray-600 dark:text-gray-400">{countedItems.length} ítems</span>
             )}
           </h3>
           {countedItems.length > 0 && (
             <button
               onClick={handleNewCount}
-              className="text-xs font-semibold text-gray-500 hover:text-black flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-gray-50 border border-transparent hover:border-gray-200"
+              className="text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-black flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-gray-50 dark:bg-gray-800 border border-transparent hover:border-gray-200 dark:border-gray-700"
             >
               <RotateCcw size={12} /> Limpiar
             </button>
@@ -354,29 +354,29 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
         </div>
 
         {countedItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+          <div className="flex flex-col items-center justify-center py-12 text-gray-400 dark:text-gray-500">
             <Package size={48} className="opacity-20 mb-3" />
             <p className="font-medium text-sm">No hay productos en el conteo</p>
-            <p className="text-xs text-gray-400 mt-1">Busca y agrega productos arriba para comenzar</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Busca y agrega productos arriba para comenzar</p>
           </div>
         ) : (
           <>
             {/* Mobile cards */}
-            <div className="md:hidden divide-y divide-gray-100">
+            <div className="md:hidden divide-y divide-gray-100 dark:divide-gray-800">
               {countedItems.map(item => (
                 <div key={item.productId} className="p-4">
                   <div className="flex justify-between items-start gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs font-mono text-gray-500">{item.sku}</p>
-                      <p className="text-sm font-bold text-gray-900 truncate">{item.productName}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">Stock sistema: <span className="font-semibold text-gray-700">{item.systemStock}</span></p>
+                      <p className="text-xs font-mono text-gray-500 dark:text-gray-400">{item.sku}</p>
+                      <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{item.productName}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Stock sistema: <span className="font-semibold text-gray-700 dark:text-gray-300">{item.systemStock}</span></p>
                     </div>
-                    <button onClick={() => handleRemove(item.productId)} className="p-2 bg-white border border-gray-200 text-gray-400 rounded-lg hover:text-red-600 hover:border-red-200">
+                    <button onClick={() => handleRemove(item.productId)} className="p-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 rounded-lg hover:text-red-600 hover:border-red-200">
                       <Trash2 size={16} />
                     </button>
                   </div>
                   <div className="flex items-center gap-2 mt-3">
-                    <button onClick={() => handleIncrement(item.productId, -1)} className="h-9 w-9 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center hover:bg-gray-200">
+                    <button onClick={() => handleIncrement(item.productId, -1)} className="h-9 w-9 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-200">
                       <Minus size={16} />
                     </button>
                     <input
@@ -384,12 +384,12 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
                       min={0}
                       value={item.countedQty}
                       onChange={e => handleQtyChange(item.productId, parseInt(e.target.value))}
-                      className="flex-1 h-9 text-center border border-gray-200 rounded-xl font-bold focus:ring-2 focus:ring-black focus:border-black outline-none"
+                      className="flex-1 h-9 text-center border border-gray-200 dark:border-gray-700 rounded-xl font-bold focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white dark:border-white outline-none dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                     />
-                    <button onClick={() => handleIncrement(item.productId, 1)} className="h-9 w-9 rounded-xl bg-black text-white flex items-center justify-center hover:bg-gray-800">
+                    <button onClick={() => handleIncrement(item.productId, 1)} className="h-9 w-9 rounded-xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center hover:bg-gray-800 dark:hover:bg-gray-200">
                       <Plus size={16} />
                     </button>
-                    <span className="text-xs text-gray-500 ml-1 whitespace-nowrap">contado</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400 ml-1 whitespace-nowrap">contado</span>
                   </div>
                 </div>
               ))}
@@ -397,8 +397,8 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
 
             {/* Desktop table */}
             <div className="hidden md:block overflow-x-auto">
-              <table className="w-full text-left text-sm text-gray-600">
-                <thead className="bg-gray-50 text-gray-500 uppercase text-xs font-semibold tracking-wider border-b border-gray-200">
+              <table className="w-full text-left text-sm text-gray-600 dark:text-gray-400">
+                <thead className="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 uppercase text-xs font-semibold tracking-wider border-b border-gray-200 dark:border-gray-700">
                   <tr>
                     <th className="px-6 py-3">SKU</th>
                     <th className="px-6 py-3">Producto</th>
@@ -407,19 +407,19 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
                     <th className="px-6 py-3 text-center">Acciones</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                   {countedItems.map(item => (
-                    <tr key={item.productId} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-3 font-mono text-xs text-gray-700">{item.sku}</td>
-                      <td className="px-6 py-3 font-semibold text-gray-900">{item.productName}</td>
+                    <tr key={item.productId} className="hover:bg-gray-50 dark:bg-gray-800 transition-colors">
+                      <td className="px-6 py-3 font-mono text-xs text-gray-700 dark:text-gray-300">{item.sku}</td>
+                      <td className="px-6 py-3 font-semibold text-gray-900 dark:text-white">{item.productName}</td>
                       <td className="px-6 py-3 text-center">
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-50 border border-gray-200 text-gray-700">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300">
                           {item.systemStock}
                         </span>
                       </td>
                       <td className="px-6 py-3">
                         <div className="flex items-center justify-center gap-1">
-                          <button onClick={() => handleIncrement(item.productId, -1)} className="h-7 w-7 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center hover:bg-gray-200">
+                          <button onClick={() => handleIncrement(item.productId, -1)} className="h-7 w-7 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-200">
                             <Minus size={14} />
                           </button>
                           <input
@@ -427,15 +427,15 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
                             min={0}
                             value={item.countedQty}
                             onChange={e => handleQtyChange(item.productId, parseInt(e.target.value))}
-                            className="w-16 h-7 text-center border border-gray-200 rounded-lg font-bold text-sm focus:ring-2 focus:ring-black focus:border-black outline-none"
+                            className="w-16 h-7 text-center border border-gray-200 dark:border-gray-700 rounded-lg font-bold text-sm focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white dark:border-white outline-none dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                           />
-                          <button onClick={() => handleIncrement(item.productId, 1)} className="h-7 w-7 rounded-lg bg-black text-white flex items-center justify-center hover:bg-gray-800">
+                          <button onClick={() => handleIncrement(item.productId, 1)} className="h-7 w-7 rounded-lg bg-black dark:bg-white text-white dark:text-black flex items-center justify-center hover:bg-gray-800 dark:hover:bg-gray-200">
                             <Plus size={14} />
                           </button>
                         </div>
                       </td>
                       <td className="px-6 py-3 text-center">
-                        <button onClick={() => handleRemove(item.productId)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                        <button onClick={() => handleRemove(item.productId)} className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                           <Trash2 size={16} />
                         </button>
                       </td>
@@ -446,11 +446,11 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
             </div>
 
             {/* Action bar */}
-            <div className="px-4 md:px-6 py-4 bg-gray-50 border-t border-gray-200 flex flex-col md:flex-row gap-3 justify-end">
+            <div className="px-4 md:px-6 py-4 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex flex-col md:flex-row gap-3 justify-end">
               {!auditPreview ? (
                 <button
                   onClick={handleAudit}
-                  className="w-full md:w-auto bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-800 flex items-center justify-center gap-2 shadow-lg shadow-gray-200 font-semibold transition-all active:scale-95 border border-black"
+                  className="w-full md:w-auto bg-black dark:bg-white text-white dark:text-black px-6 py-3 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 flex items-center justify-center gap-2 shadow-lg shadow-gray-200 font-semibold transition-all active:scale-95 border border-black dark:border-white"
                 >
                   <ClipboardCheck size={18} /> Realizar Auditoría
                 </button>
@@ -458,13 +458,13 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
                 <div className="flex gap-3 w-full md:w-auto">
                   <button
                     onClick={() => setAuditPreview(null)}
-                    className="flex-1 md:flex-none px-5 py-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 font-medium flex items-center justify-center gap-2"
+                    className="flex-1 md:flex-none px-5 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:bg-gray-800 font-medium flex items-center justify-center gap-2"
                   >
                     <X size={16} /> Seguir contando
                   </button>
                   <button
                     onClick={handleSaveAudit}
-                    className="flex-1 md:flex-none px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-800 font-semibold flex items-center justify-center gap-2 shadow-lg border border-black"
+                    className="flex-1 md:flex-none px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 font-semibold flex items-center justify-center gap-2 shadow-lg border border-black dark:border-white"
                   >
                     <Save size={16} /> Guardar Auditoría
                   </button>
@@ -479,15 +479,15 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
       {auditPreview && (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-bold text-gray-900">Resultado de auditoría</h3>
-            <span className="text-xs text-gray-500 bg-white border border-gray-200 px-2 py-1 rounded-full">{new Date().toLocaleDateString('es-CR')} {new Date().toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' })}</span>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Resultado de auditoría</h3>
+            <span className="text-xs text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 px-2 py-1 rounded-full">{new Date().toLocaleDateString('es-CR')} {new Date().toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' })}</span>
           </div>
 
           {/* Summary cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-green-50 border border-green-200 rounded-2xl p-5">
               <div className="flex items-center gap-2">
-                <span className="h-8 w-8 rounded-xl bg-green-600 text-white flex items-center justify-center">
+                <span className="h-8 w-8 rounded-xl bg-green-600 text-white dark:text-black flex items-center justify-center">
                   <CheckCircle size={16} />
                 </span>
                 <p className="text-sm font-bold text-green-900">Coinciden</p>
@@ -497,7 +497,7 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
             </div>
             <div className="bg-red-50 border border-red-200 rounded-2xl p-5">
               <div className="flex items-center gap-2">
-                <span className="h-8 w-8 rounded-xl bg-red-600 text-white flex items-center justify-center">
+                <span className="h-8 w-8 rounded-xl bg-red-600 text-white dark:text-black flex items-center justify-center">
                   <AlertTriangle size={16} />
                 </span>
                 <p className="text-sm font-bold text-red-900">Faltantes</p>
@@ -507,7 +507,7 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
             </div>
             <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5">
               <div className="flex items-center gap-2">
-                <span className="h-8 w-8 rounded-xl bg-blue-600 text-white flex items-center justify-center">
+                <span className="h-8 w-8 rounded-xl bg-blue-600 text-white dark:text-black flex items-center justify-center">
                   <TrendingUp size={16} />
                 </span>
                 <p className="text-sm font-bold text-blue-900">Sobrantes</p>
@@ -519,27 +519,27 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
 
           {/* Detail tables */}
           {/* Coinciden */}
-          <div className="bg-white rounded-2xl shadow-sm border border-green-200 overflow-hidden">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-green-200 overflow-hidden">
             <div className="px-4 md:px-6 py-3 bg-green-50 border-b border-green-200 flex items-center gap-2">
               <CheckCircle size={16} className="text-green-700" />
               <h4 className="font-bold text-green-900 text-sm">Coinciden</h4>
-              <span className="ml-auto text-xs font-semibold bg-white border border-green-200 text-green-700 px-2 py-0.5 rounded-full">{auditPreview.matched.length} ítems</span>
+              <span className="ml-auto text-xs font-semibold bg-white dark:bg-gray-900 border border-green-200 text-green-700 px-2 py-0.5 rounded-full">{auditPreview.matched.length} ítems</span>
             </div>
             {auditPreview.matched.length === 0 ? (
-              <p className="px-6 py-8 text-center text-sm text-gray-400">Ningún producto coincide exactamente.</p>
+              <p className="px-6 py-8 text-center text-sm text-gray-400 dark:text-gray-500">Ningún producto coincide exactamente.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+                  <thead className="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 uppercase text-xs">
                     <tr><th className="px-4 md:px-6 py-2">SKU</th><th className="px-4 md:px-6 py-2">Producto</th><th className="px-4 md:px-6 py-2 text-center">Contado</th><th className="px-4 md:px-6 py-2 text-center">Sistema</th></tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                     {auditPreview.matched.map(m => (
-                      <tr key={m.productId} className="hover:bg-gray-50">
+                      <tr key={m.productId} className="hover:bg-gray-50 dark:bg-gray-800">
                         <td className="px-4 md:px-6 py-2 font-mono text-xs">{m.sku}</td>
-                        <td className="px-4 md:px-6 py-2 font-medium text-gray-900">{m.productName}</td>
+                        <td className="px-4 md:px-6 py-2 font-medium text-gray-900 dark:text-white">{m.productName}</td>
                         <td className="px-4 md:px-6 py-2 text-center font-bold text-green-700">{m.countedQty}</td>
-                        <td className="px-4 md:px-6 py-2 text-center text-gray-600">{m.systemStock}</td>
+                        <td className="px-4 md:px-6 py-2 text-center text-gray-600 dark:text-gray-400">{m.systemStock}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -549,25 +549,25 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
           </div>
 
           {/* Faltantes */}
-          <div className="bg-white rounded-2xl shadow-sm border border-red-200 overflow-hidden">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-red-200 overflow-hidden">
             <div className="px-4 md:px-6 py-3 bg-red-50 border-b border-red-200 flex items-center gap-2">
               <AlertTriangle size={16} className="text-red-700" />
               <h4 className="font-bold text-red-900 text-sm">Faltantes</h4>
-              <span className="ml-auto text-xs font-semibold bg-white border border-red-200 text-red-700 px-2 py-0.5 rounded-full">{auditPreview.missing.length} ítems · {auditPreview.missing.reduce((a, c) => a + c.diff, 0)} unidades</span>
+              <span className="ml-auto text-xs font-semibold bg-white dark:bg-gray-900 border border-red-200 text-red-700 px-2 py-0.5 rounded-full">{auditPreview.missing.length} ítems · {auditPreview.missing.reduce((a, c) => a + c.diff, 0)} unidades</span>
             </div>
             {auditPreview.missing.length === 0 ? (
-              <p className="px-6 py-8 text-center text-sm text-gray-400">No hay faltantes.</p>
+              <p className="px-6 py-8 text-center text-sm text-gray-400 dark:text-gray-500">No hay faltantes.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+                  <thead className="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 uppercase text-xs">
                     <tr><th className="px-4 md:px-6 py-2">SKU</th><th className="px-4 md:px-6 py-2">Producto</th><th className="px-4 md:px-6 py-2 text-center">Contado</th><th className="px-4 md:px-6 py-2 text-center">Sistema</th><th className="px-4 md:px-6 py-2 text-center">Diferencia</th></tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                     {auditPreview.missing.map(m => (
                       <tr key={m.productId} className="hover:bg-red-50/50">
                         <td className="px-4 md:px-6 py-2 font-mono text-xs">{m.sku}</td>
-                        <td className="px-4 md:px-6 py-2 font-medium text-gray-900">{m.productName}</td>
+                        <td className="px-4 md:px-6 py-2 font-medium text-gray-900 dark:text-white">{m.productName}</td>
                         <td className="px-4 md:px-6 py-2 text-center">{m.countedQty}</td>
                         <td className="px-4 md:px-6 py-2 text-center">{m.systemStock}</td>
                         <td className="px-4 md:px-6 py-2 text-center"><span className="inline-flex px-2 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-200">Faltan {m.diff}</span></td>
@@ -580,25 +580,25 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
           </div>
 
           {/* Sobrantes */}
-          <div className="bg-white rounded-2xl shadow-sm border border-blue-200 overflow-hidden">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-blue-200 overflow-hidden">
             <div className="px-4 md:px-6 py-3 bg-blue-50 border-b border-blue-200 flex items-center gap-2">
               <TrendingUp size={16} className="text-blue-700" />
               <h4 className="font-bold text-blue-900 text-sm">Sobrantes</h4>
-              <span className="ml-auto text-xs font-semibold bg-white border border-blue-200 text-blue-700 px-2 py-0.5 rounded-full">{auditPreview.extra.length} ítems · {auditPreview.extra.reduce((a, c) => a + c.diff, 0)} unidades</span>
+              <span className="ml-auto text-xs font-semibold bg-white dark:bg-gray-900 border border-blue-200 text-blue-700 px-2 py-0.5 rounded-full">{auditPreview.extra.length} ítems · {auditPreview.extra.reduce((a, c) => a + c.diff, 0)} unidades</span>
             </div>
             {auditPreview.extra.length === 0 ? (
-              <p className="px-6 py-8 text-center text-sm text-gray-400">No hay sobrantes.</p>
+              <p className="px-6 py-8 text-center text-sm text-gray-400 dark:text-gray-500">No hay sobrantes.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+                  <thead className="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 uppercase text-xs">
                     <tr><th className="px-4 md:px-6 py-2">SKU</th><th className="px-4 md:px-6 py-2">Producto</th><th className="px-4 md:px-6 py-2 text-center">Contado</th><th className="px-4 md:px-6 py-2 text-center">Sistema</th><th className="px-4 md:px-6 py-2 text-center">Diferencia</th></tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                     {auditPreview.extra.map(m => (
                       <tr key={m.productId} className="hover:bg-blue-50/50">
                         <td className="px-4 md:px-6 py-2 font-mono text-xs">{m.sku}</td>
-                        <td className="px-4 md:px-6 py-2 font-medium text-gray-900">{m.productName}</td>
+                        <td className="px-4 md:px-6 py-2 font-medium text-gray-900 dark:text-white">{m.productName}</td>
                         <td className="px-4 md:px-6 py-2 text-center">{m.countedQty}</td>
                         <td className="px-4 md:px-6 py-2 text-center">{m.systemStock}</td>
                         <td className="px-4 md:px-6 py-2 text-center"><span className="inline-flex px-2 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700 border border-blue-200">Sobran {m.diff}</span></td>
@@ -613,30 +613,30 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
           <div className="flex flex-col md:flex-row gap-3 justify-end">
             <button
               onClick={() => setAuditPreview(null)}
-              className="px-5 py-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 font-medium flex items-center justify-center gap-2"
+              className="px-5 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:bg-gray-800 font-medium flex items-center justify-center gap-2"
             >
               <X size={16} /> Cerrar resultado
             </button>
             <button
               onClick={handleSaveAudit}
-              className="px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-800 font-semibold flex items-center justify-center gap-2 shadow-lg border border-black"
+              className="px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 font-semibold flex items-center justify-center gap-2 shadow-lg border border-black dark:border-white"
             >
               <Save size={16} /> Guardar Auditoría
             </button>
             <button
               onClick={handleNewCount}
-              className="px-5 py-3 bg-gray-100 border border-gray-200 rounded-xl hover:bg-gray-200 font-medium flex items-center justify-center gap-2 text-gray-700"
+              className="px-5 py-3 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-200 font-medium flex items-center justify-center gap-2 text-gray-700 dark:text-gray-300"
             >
               <RotateCcw size={16} /> Nuevo conteo
             </button>
           </div>
-          <p className="text-xs text-gray-400 text-center">Esta auditoría no modifica el stock automáticamente. Usa el módulo de Inventario para ajustes manuales si lo requieres.</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 text-center">Esta auditoría no modifica el stock automáticamente. Usa el módulo de Inventario para ajustes manuales si lo requieres.</p>
         </div>
       )}
 
       {/* New count hint after save */}
       {!auditPreview && countedItems.length > 0 && audits.length > 0 && (
-        <p className="text-xs text-gray-400 text-center">Después de guardar, puedes iniciar un nuevo conteo limpiando la lista.</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500 text-center">Después de guardar, puedes iniciar un nuevo conteo limpiando la lista.</p>
       )}
     </div>
   );

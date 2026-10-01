@@ -57,10 +57,10 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onCancelInvoice, on
   // Helper to get status styles (Grayscale edition)
   const getStatusStyles = (status: string) => {
     switch (status) {
-      case 'paid': return 'bg-gray-900 text-white border-gray-900';
-      case 'pending': return 'bg-white text-gray-900 border-gray-400 border-2 border-dashed';
-      case 'cancelled': return 'bg-gray-100 text-gray-400 border-gray-200 line-through';
-      default: return 'bg-gray-50 text-gray-700 border-gray-200';
+      case 'paid': return 'bg-gray-900 text-white dark:text-black border-gray-900';
+      case 'pending': return 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-gray-400 border-2 border-dashed';
+      case 'cancelled': return 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-700 line-through';
+      default: return 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700';
     }
   };
 
@@ -77,31 +77,31 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onCancelInvoice, on
     switch (status) {
       case 'aceptado': 
         return (
-          <span className="flex items-center gap-1 text-[10px] font-bold text-black bg-gray-100 px-2 py-1 rounded-full border border-gray-200 w-fit">
+          <span className="flex items-center gap-1 text-[10px] font-bold text-black bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full border border-gray-200 dark:border-gray-700 w-fit">
             <CheckCircle size={12} /> ACEPTADA
           </span>
         );
       case 'rechazado': 
         return (
-          <span className="flex items-center gap-1 text-[10px] font-bold text-gray-700 bg-gray-200 px-2 py-1 rounded-full border border-gray-300 w-fit">
+          <span className="flex items-center gap-1 text-[10px] font-bold text-gray-700 dark:text-gray-300 bg-gray-200 px-2 py-1 rounded-full border border-gray-300 w-fit">
             <X size={12} /> RECHAZADA
           </span>
         );
       case 'procesando': 
         return (
-          <span className="flex items-center gap-1 text-[10px] font-bold text-gray-600 bg-white px-2 py-1 rounded-full border border-dashed border-gray-400 w-fit">
+          <span className="flex items-center gap-1 text-[10px] font-bold text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-900 px-2 py-1 rounded-full border border-dashed border-gray-400 w-fit">
             <Clock size={12} /> PROCESANDO
           </span>
         );
       case 'anulado': 
         return (
-          <span className="flex items-center gap-1 text-[10px] font-bold text-gray-400 bg-gray-50 px-2 py-1 rounded-full border border-gray-200 w-fit">
+          <span className="flex items-center gap-1 text-[10px] font-bold text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-full border border-gray-200 dark:border-gray-700 w-fit">
             <FileWarning size={12} /> ANULADA
           </span>
         );
       default:
          return (
-          <span className="flex items-center gap-1 text-[10px] font-bold text-gray-400 bg-gray-50 px-2 py-1 rounded-full border border-gray-200 w-fit">
+          <span className="flex items-center gap-1 text-[10px] font-bold text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-full border border-gray-200 dark:border-gray-700 w-fit">
             NO ENVIADA
           </span>
         );
@@ -192,30 +192,30 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onCancelInvoice, on
   return (
     <div className="space-y-6 md:space-y-8 animate-fade-in pb-10">
       <div>
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Historial de Facturas</h2>
-        <p className="text-gray-500 mt-1 text-sm md:text-base">Registro completo de movimientos electrónicos</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Historial de Facturas</h2>
+        <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm md:text-base">Registro completo de movimientos electrónicos</p>
       </div>
       
       {/* Mobile Card View */}
       <div className="md:hidden space-y-4">
         {invoices.length === 0 ? (
-           <div className="flex flex-col items-center justify-center py-12 text-gray-400 bg-white rounded-2xl border border-dashed border-gray-200">
+           <div className="flex flex-col items-center justify-center py-12 text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-900 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700">
               <FileText size={48} strokeWidth={1} />
               <p className="mt-2 font-medium">No hay facturas registradas</p>
            </div>
         ) : (
           invoices.map(inv => (
-            <div key={inv.id} className={`bg-white p-5 rounded-2xl shadow-sm border ${inv.status === 'cancelled' ? 'border-gray-200 bg-gray-50' : 'border-gray-200'} relative overflow-hidden`}>
-              {inv.status === 'cancelled' && <div className="absolute top-0 right-0 bg-gray-200 text-gray-500 px-2 py-1 rounded-bl-lg text-[10px] font-bold uppercase">Anulada</div>}
+            <div key={inv.id} className={`bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-sm border ${inv.status === 'cancelled' ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800' : 'border-gray-200 dark:border-gray-700'} relative overflow-hidden`}>
+              {inv.status === 'cancelled' && <div className="absolute top-0 right-0 bg-gray-200 text-gray-500 dark:text-gray-400 px-2 py-1 rounded-bl-lg text-[10px] font-bold uppercase">Anulada</div>}
               
               <div className="flex justify-between items-start mb-3">
                 <div>
-                   <p className="text-xs font-bold text-gray-900 mb-0.5">{inv.number}</p>
-                   <h3 className="font-bold text-gray-900 text-lg">{inv.customerName}</h3>
-                   <p className="text-xs text-gray-500">{new Date(inv.date).toLocaleDateString()} • {new Date(inv.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                   <p className="text-xs font-bold text-gray-900 dark:text-white mb-0.5">{inv.number}</p>
+                   <h3 className="font-bold text-gray-900 dark:text-white text-lg">{inv.customerName}</h3>
+                   <p className="text-xs text-gray-500 dark:text-gray-400">{new Date(inv.date).toLocaleDateString()} • {new Date(inv.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                 </div>
                 <div className="text-right">
-                   <p className={`text-lg font-bold ${inv.status === 'cancelled' ? 'text-gray-400 line-through' : 'text-gray-900'}`}>
+                   <p className={`text-lg font-bold ${inv.status === 'cancelled' ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-gray-900 dark:text-white'}`}>
                      {getCurrencySymbol(inv)} {inv.total.toLocaleString('en-US', {minimumFractionDigits: 2})}
                    </p>
                    {inv.status === 'pending' && (
@@ -233,7 +233,7 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onCancelInvoice, on
                  </span>
                  <div className="flex gap-2">
                     {/* View History Button */}
-                    <button onClick={() => openHistoryModal(inv)} className="p-2 bg-gray-50 text-gray-600 rounded-lg active:scale-95 transition-all border border-gray-200 hover:bg-gray-100" title="Ver Historial Pagos">
+                    <button onClick={() => openHistoryModal(inv)} className="p-2 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-lg active:scale-95 transition-all border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:bg-gray-800" title="Ver Historial Pagos">
                         <History size={18} />
                     </button>
                     {inv.status === 'pending' && (
@@ -242,11 +242,11 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onCancelInvoice, on
                         </button>
                     )}
                     {inv.status !== 'cancelled' && (
-                      <button onClick={() => onCancelInvoice(inv)} className="p-2 bg-white text-gray-500 rounded-lg active:scale-95 transition-all border border-gray-200 hover:text-red-600">
+                      <button onClick={() => onCancelInvoice(inv)} className="p-2 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 rounded-lg active:scale-95 transition-all border border-gray-200 dark:border-gray-700 hover:text-red-600">
                         <Ban size={18} />
                       </button>
                     )}
-                    <button onClick={() => handlePrint(inv)} className="px-4 py-2 bg-black text-white rounded-lg active:scale-95 transition-all shadow-md flex items-center gap-2 font-medium text-sm border border-black hover:bg-gray-800">
+                    <button onClick={() => handlePrint(inv)} className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg active:scale-95 transition-all shadow-md flex items-center gap-2 font-medium text-sm border border-black hover:bg-gray-800 dark:hover:bg-gray-200">
                       <Printer size={16} />
                     </button>
                  </div>
@@ -257,10 +257,10 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onCancelInvoice, on
       </div>
 
       {/* Desktop Table View */}
-      <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="hidden md:block bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-600">
-            <thead className="bg-gray-50 text-gray-500 uppercase text-xs font-semibold tracking-wider">
+          <table className="w-full text-left text-sm text-gray-600 dark:text-gray-400">
+            <thead className="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 uppercase text-xs font-semibold tracking-wider">
               <tr>
                 <th className="px-6 py-4 rounded-tl-2xl">Número / Hacienda</th>
                 <th className="px-6 py-4">Cliente</th>
@@ -271,11 +271,11 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onCancelInvoice, on
                 <th className="px-6 py-4 text-center rounded-tr-2xl">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
               {invoices.length === 0 ? (
                  <tr>
                    <td colSpan={7} className="px-6 py-16 text-center">
-                      <div className="flex flex-col items-center justify-center text-gray-400 opacity-60">
+                      <div className="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 opacity-60">
                         <FileText size={48} strokeWidth={1} />
                         <p className="mt-2 font-medium">No hay facturas registradas</p>
                       </div>
@@ -283,17 +283,17 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onCancelInvoice, on
                  </tr>
               ) : (
                 invoices.map(inv => (
-                  <tr key={inv.id} className={`transition-colors group ${inv.status === 'cancelled' ? 'bg-gray-50 opacity-75' : 'hover:bg-gray-50'}`}>
+                  <tr key={inv.id} className={`transition-colors group ${inv.status === 'cancelled' ? 'bg-gray-50 dark:bg-gray-800 opacity-75' : 'hover:bg-gray-50 dark:bg-gray-800'}`}>
                     <td className="px-6 py-4">
-                       <div className={`font-mono font-medium ${inv.status === 'cancelled' ? 'text-gray-400 line-through decoration-gray-400' : 'text-black'}`}>{inv.number}</div>
+                       <div className={`font-mono font-medium ${inv.status === 'cancelled' ? 'text-gray-400 dark:text-gray-500 line-through decoration-gray-400' : 'text-black'}`}>{inv.number}</div>
                        <div className="mt-1">
                           {getHaciendaStatusBadge(inv.haciendaStatus)}
                        </div>
                     </td>
-                    <td className="px-6 py-4 font-medium text-gray-900">{inv.customerName}</td>
-                    <td className="px-6 py-4 text-gray-500">{new Date(inv.date).toLocaleDateString()}</td>
-                    <td className={`px-6 py-4 text-right font-bold ${inv.status === 'cancelled' ? 'text-gray-400 line-through decoration-gray-400' : 'text-gray-900'}`}>{getCurrencySymbol(inv)} {inv.total.toFixed(2)}</td>
-                    <td className="px-6 py-4 text-right font-bold text-gray-600">
+                    <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{inv.customerName}</td>
+                    <td className="px-6 py-4 text-gray-500 dark:text-gray-400">{new Date(inv.date).toLocaleDateString()}</td>
+                    <td className={`px-6 py-4 text-right font-bold ${inv.status === 'cancelled' ? 'text-gray-400 dark:text-gray-500 line-through decoration-gray-400' : 'text-gray-900 dark:text-white'}`}>{getCurrencySymbol(inv)} {inv.total.toFixed(2)}</td>
+                    <td className="px-6 py-4 text-right font-bold text-gray-600 dark:text-gray-400">
                         {inv.status === 'pending' 
                             ? <span className="text-red-600">{getCurrencySymbol(inv)} {getEffectiveBalance(inv).toLocaleString('en-US', {minimumFractionDigits: 2})}</span> 
                             : '-'
@@ -309,7 +309,7 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onCancelInvoice, on
                         {/* History Button */}
                         <button 
                             onClick={() => openHistoryModal(inv)}
-                            className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-lg transition-colors"
+                            className="p-2 text-gray-500 dark:text-gray-400 hover:text-black hover:bg-gray-100 dark:bg-gray-800 rounded-lg transition-colors"
                             title="Ver Historial de Pagos"
                         >
                             <History size={18} />
@@ -326,7 +326,7 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onCancelInvoice, on
                         )}
                         <button 
                           onClick={() => handlePrint(inv)}
-                          className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-lg transition-colors" 
+                          className="p-2 text-gray-500 dark:text-gray-400 hover:text-black hover:bg-gray-100 dark:bg-gray-800 rounded-lg transition-colors" 
                           title="Imprimir"
                         >
                           <Printer size={18} />
@@ -335,7 +335,7 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onCancelInvoice, on
                         {inv.status !== 'cancelled' && (
                           <button 
                             onClick={() => onCancelInvoice(inv)}
-                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-gray-50 rounded-lg transition-colors border border-transparent hover:border-gray-200" 
+                            className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 hover:bg-gray-50 dark:bg-gray-800 rounded-lg transition-colors border border-transparent hover:border-gray-200 dark:border-gray-700" 
                             title="Anular Factura (Devolver Stock)"
                           >
                             <Ban size={18} />
@@ -354,35 +354,35 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onCancelInvoice, on
       {/* Payment Modal */}
       {isPayModalOpen && payInvoice && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-              <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in">
-                  <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+              <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in">
+                  <div className="bg-gray-50 dark:bg-gray-800 px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
                       <div>
-                          <h3 className="font-bold text-lg text-gray-900">Nuevo Recibo</h3>
-                          <p className="text-xs text-gray-500">Abonar a Factura {payInvoice.number}</p>
+                          <h3 className="font-bold text-lg text-gray-900 dark:text-white">Nuevo Recibo</h3>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Abonar a Factura {payInvoice.number}</p>
                       </div>
-                      <button onClick={() => setIsPayModalOpen(false)} className="text-gray-400 hover:text-black"><X size={20} /></button>
+                      <button onClick={() => setIsPayModalOpen(false)} className="text-gray-400 dark:text-gray-500 hover:text-black"><X size={20} /></button>
                   </div>
                   
                   <form onSubmit={handlePaymentSubmit} className="p-6 space-y-4">
-                      <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 mb-4">
+                      <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700 mb-4">
                           <div className="flex justify-between text-sm mb-1">
-                              <span className="text-gray-500">Total Factura:</span>
+                              <span className="text-gray-500 dark:text-gray-400">Total Factura:</span>
                               <span className="font-semibold">{getCurrencySymbol(payInvoice)} {payInvoice.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
                           </div>
                           <div className="flex justify-between text-sm">
-                              <span className="text-gray-500">Saldo Pendiente:</span>
+                              <span className="text-gray-500 dark:text-gray-400">Saldo Pendiente:</span>
                               <span className="font-bold text-red-600">{getCurrencySymbol(payInvoice)} {getEffectiveBalance(payInvoice).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
                           </div>
                       </div>
 
                       <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1"><Calendar size={12}/> Fecha Pago</label>
+                          <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase flex items-center gap-1"><Calendar size={12}/> Fecha Pago</label>
                           <input required type="date" value={paymentData.date} onChange={e => setPaymentData({...paymentData, date: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black outline-none" />
                       </div>
 
                       <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1"><CreditCard size={12}/> Método</label>
-                          <select value={paymentData.method} onChange={e => setPaymentData({...paymentData, method: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black outline-none bg-white">
+                          <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase flex items-center gap-1"><CreditCard size={12}/> Método</label>
+                          <select value={paymentData.method} onChange={e => setPaymentData({...paymentData, method: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black outline-none bg-white dark:bg-gray-900">
                               <option value="Efectivo">Efectivo</option>
                               <option value="Tarjeta">Tarjeta</option>
                               <option value="Transferencia">Transferencia</option>
@@ -391,7 +391,7 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onCancelInvoice, on
                       </div>
 
                       <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1"><DollarSign size={12}/> Monto a Pagar</label>
+                          <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase flex items-center gap-1"><DollarSign size={12}/> Monto a Pagar</label>
                           <input 
                               required 
                               type="number" 
@@ -404,11 +404,11 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onCancelInvoice, on
                       </div>
                       
                       <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-gray-500 uppercase">Notas</label>
+                          <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Notas</label>
                           <textarea rows={2} value={paymentData.notes} onChange={e => setPaymentData({...paymentData, notes: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black outline-none resize-none" placeholder="Referencia bancaria, etc..." />
                       </div>
 
-                      <button type="submit" className="w-full bg-black text-white py-3 rounded-lg font-bold shadow-lg hover:bg-gray-800 transition-all active:scale-95 mt-2">
+                      <button type="submit" className="w-full bg-black dark:bg-white text-white dark:text-black py-3 rounded-lg font-bold shadow-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-all active:scale-95 mt-2">
                           Registrar Pago
                       </button>
                   </form>
@@ -419,29 +419,29 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onCancelInvoice, on
       {/* Receipt Success / Print Modal */}
       {receiptData && settings && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-              <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden animate-scale-in">
+              <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden animate-scale-in">
                   {/* Toolbar */}
-                  <div className="bg-gray-900 p-4 flex justify-between items-center shrink-0 text-white border-b border-gray-700">
+                  <div className="bg-gray-900 p-4 flex justify-between items-center shrink-0 text-white dark:text-black border-b border-gray-700">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-green-500 rounded-full text-white shadow-lg shadow-green-900/50"><CheckCircle size={24} /></div>
+                            <div className="p-2 bg-green-500 rounded-full text-white dark:text-black shadow-lg shadow-green-900/50"><CheckCircle size={24} /></div>
                             <div>
                                 <h3 className="font-bold text-lg">Pago Registrado Exitosamente</h3>
                                 <p className="text-xs text-gray-300">Se ha generado el comprobante de pago.</p>
                             </div>
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={() => window.print()} className="px-6 py-2.5 bg-white text-black rounded-lg font-bold flex items-center gap-2 hover:bg-gray-200 transition-colors shadow-lg shadow-white/10 active:scale-95">
+                            <button onClick={() => window.print()} className="px-6 py-2.5 bg-white dark:bg-gray-900 text-black rounded-lg font-bold flex items-center gap-2 hover:bg-gray-200 transition-colors shadow-lg shadow-white/10 active:scale-95">
                                 <Printer size={18} /> Imprimir Comprobante
                             </button>
-                            <button onClick={handleCloseReceipt} className="px-4 py-2.5 bg-gray-800 text-white border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors">
+                            <button onClick={handleCloseReceipt} className="px-4 py-2.5 bg-gray-800 text-white dark:text-black border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors">
                                 <X size={18} /> Cerrar
                             </button>
                         </div>
                   </div>
                   
                   {/* Preview Content */}
-                  <div className="flex-1 bg-gray-100 overflow-auto p-4 md:p-8 flex justify-center">
-                      <div className="w-full max-w-[210mm] shadow-2xl bg-white origin-top transform transition-transform">
+                  <div className="flex-1 bg-gray-100 dark:bg-gray-800 overflow-auto p-4 md:p-8 flex justify-center">
+                      <div className="w-full max-w-[210mm] shadow-2xl bg-white dark:bg-gray-900 origin-top transform transition-transform">
                           <ReceiptPrint payment={receiptData.payment} invoice={receiptData.invoice} settings={settings} />
                       </div>
                   </div>
@@ -452,54 +452,54 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onCancelInvoice, on
       {/* History Modal */}
       {isHistoryModalOpen && historyInvoice && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-              <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-scale-in">
-                  <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+              <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-scale-in">
+                  <div className="bg-gray-50 dark:bg-gray-800 px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
                       <div>
-                          <h3 className="font-bold text-lg text-gray-900">Historial de Pagos</h3>
-                          <p className="text-xs text-gray-500">Factura {historyInvoice.number} - {historyInvoice.customerName}</p>
+                          <h3 className="font-bold text-lg text-gray-900 dark:text-white">Historial de Pagos</h3>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Factura {historyInvoice.number} - {historyInvoice.customerName}</p>
                       </div>
-                      <button onClick={() => setIsHistoryModalOpen(false)} className="text-gray-400 hover:text-black"><X size={20} /></button>
+                      <button onClick={() => setIsHistoryModalOpen(false)} className="text-gray-400 dark:text-gray-500 hover:text-black"><X size={20} /></button>
                   </div>
                   
                   <div className="p-6">
-                      <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 mb-6 grid grid-cols-2 gap-4 text-center">
+                      <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700 mb-6 grid grid-cols-2 gap-4 text-center">
                           <div>
-                            <span className="block text-xs text-gray-500 uppercase font-bold">Total Factura</span>
-                            <span className="text-lg font-bold text-gray-900">{getCurrencySymbol(historyInvoice)} {historyInvoice.total.toLocaleString()}</span>
+                            <span className="block text-xs text-gray-500 dark:text-gray-400 uppercase font-bold">Total Factura</span>
+                            <span className="text-lg font-bold text-gray-900 dark:text-white">{getCurrencySymbol(historyInvoice)} {historyInvoice.total.toLocaleString()}</span>
                           </div>
                           <div>
-                            <span className="block text-xs text-gray-500 uppercase font-bold">Saldo Pendiente</span>
+                            <span className="block text-xs text-gray-500 dark:text-gray-400 uppercase font-bold">Saldo Pendiente</span>
                             <span className="text-lg font-bold text-red-600">{getCurrencySymbol(historyInvoice)} {getEffectiveBalance(historyInvoice).toLocaleString()}</span>
                           </div>
                       </div>
 
                       <div className="max-h-[300px] overflow-y-auto">
                         <table className="w-full text-sm">
-                            <thead className="text-xs text-gray-500 uppercase bg-gray-50 sticky top-0">
+                            <thead className="text-xs text-gray-500 dark:text-gray-400 uppercase bg-gray-50 dark:bg-gray-800 sticky top-0">
                                 <tr>
                                     <th className="px-3 py-2 text-left">Fecha</th>
                                     <th className="px-3 py-2 text-left">Método</th>
                                     <th className="px-3 py-2 text-right">Monto</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                                 {!historyInvoice.payments || historyInvoice.payments.length === 0 ? (
                                     <tr>
-                                        <td colSpan={3} className="px-3 py-8 text-center text-gray-400">
+                                        <td colSpan={3} className="px-3 py-8 text-center text-gray-400 dark:text-gray-500">
                                             No hay pagos registrados.
                                         </td>
                                     </tr>
                                 ) : (
                                     historyInvoice.payments.map((payment, idx) => (
-                                        <tr key={idx} className="hover:bg-gray-50">
+                                        <tr key={idx} className="hover:bg-gray-50 dark:bg-gray-800">
                                             <td className="px-3 py-2.5">
-                                                <div className="font-medium text-gray-900">{new Date(payment.date).toLocaleDateString()}</div>
+                                                <div className="font-medium text-gray-900 dark:text-white">{new Date(payment.date).toLocaleDateString()}</div>
                                             </td>
                                             <td className="px-3 py-2.5">
-                                                <div className="text-gray-700">{payment.method}</div>
-                                                {payment.notes && <div className="text-[10px] text-gray-400 truncate max-w-[120px]">{payment.notes}</div>}
+                                                <div className="text-gray-700 dark:text-gray-300">{payment.method}</div>
+                                                {payment.notes && <div className="text-[10px] text-gray-400 dark:text-gray-500 truncate max-w-[120px]">{payment.notes}</div>}
                                             </td>
-                                            <td className="px-3 py-2.5 text-right font-bold text-gray-900">
+                                            <td className="px-3 py-2.5 text-right font-bold text-gray-900 dark:text-white">
                                                 {getCurrencySymbol(historyInvoice)} {payment.amount.toLocaleString()}
                                             </td>
                                         </tr>
@@ -510,8 +510,8 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onCancelInvoice, on
                       </div>
                   </div>
                   
-                  <div className="bg-gray-50 px-6 py-4 border-t border-gray-100 flex justify-end">
-                      <button onClick={() => setIsHistoryModalOpen(false)} className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-sm">
+                  <div className="bg-gray-50 dark:bg-gray-800 px-6 py-4 border-t border-gray-100 dark:border-gray-800 flex justify-end">
+                      <button onClick={() => setIsHistoryModalOpen(false)} className="px-4 py-2 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 font-medium text-sm">
                           Cerrar
                       </button>
                   </div>
@@ -521,17 +521,17 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onCancelInvoice, on
 
       {/* Hidden Print Modal / Area - Only visible when printing */}
       {selectedInvoice && printSettings && (
-        <div className="fixed inset-0 z-[9999] bg-white flex justify-center items-start overflow-auto p-0 md:p-10 print:p-0 print:block hidden md:flex">
+        <div className="fixed inset-0 z-[9999] bg-white dark:bg-gray-900 flex justify-center items-start overflow-auto p-0 md:p-10 print:p-0 print:block hidden md:flex">
            {/* Close button for the preview mode (hidden when printing) */}
            <button 
              onClick={() => setSelectedInvoice(null)} 
-             className="fixed top-4 right-4 bg-black text-white p-2 rounded-full shadow-lg no-print z-50 hover:bg-gray-800"
+             className="fixed top-4 right-4 bg-black dark:bg-white text-white dark:text-black p-2 rounded-full shadow-lg no-print z-50 hover:bg-gray-800 dark:hover:bg-gray-200"
            >
              <X size={20} />
            </button>
            
            {/* Container for screen preview, print area overrides this */}
-           <div className="bg-white shadow-2xl w-full max-w-[210mm] min-h-[297mm] print:shadow-none print:w-full print:h-auto">
+           <div className="bg-white dark:bg-gray-900 shadow-2xl w-full max-w-[210mm] min-h-[297mm] print:shadow-none print:w-full print:h-auto">
              <InvoicePrint invoice={selectedInvoice} settings={printSettings} customer={printCustomer} />
            </div>
         </div>

@@ -149,21 +149,21 @@ const UserManagement: React.FC = () => {
     <div className="max-w-3xl mx-auto space-y-6 md:space-y-8 animate-fade-in pb-20 md:pb-10 px-1 sm:px-0">
       {/* Header */}
       <div>
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
-          <div className="h-9 w-9 md:h-10 md:w-10 rounded-xl bg-black flex items-center justify-center shadow-lg flex-shrink-0">
-            <Users size={20} className="text-white" />
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2 sm:gap-3">
+          <div className="h-9 w-9 md:h-10 md:w-10 rounded-xl bg-black dark:bg-white flex items-center justify-center shadow-lg flex-shrink-0">
+            <Users size={20} className="text-white dark:text-black" />
           </div>
           <span className="truncate">Gestión de Usuarios</span>
         </h2>
-        <p className="text-gray-500 mt-1 text-sm md:text-base break-words">
-          Organización: <span className="font-semibold text-gray-700 break-all">{organization?.name}</span>
+        <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm md:text-base break-words">
+          Organización: <span className="font-semibold text-gray-700 dark:text-gray-300 break-all">{organization?.name}</span>
         </p>
       </div>
 
       {/* ── Add by email ────────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 md:p-6">
-        <h3 className="font-bold text-gray-800 flex items-center gap-2 mb-5 text-sm md:text-base">
-          <Mail size={18} className="text-gray-500 flex-shrink-0" /> Agregar usuario por correo
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6">
+        <h3 className="font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2 mb-5 text-sm md:text-base">
+          <Mail size={18} className="text-gray-500 dark:text-gray-400 flex-shrink-0" /> Agregar usuario por correo
         </h3>
         <form onSubmit={handleAddMember} className="flex flex-col sm:flex-row gap-3">
           <input
@@ -172,10 +172,10 @@ const UserManagement: React.FC = () => {
             value={emailToAdd}
             onChange={e => setEmailToAdd(e.target.value)}
             placeholder="usuario@empresa.com"
-            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black outline-none transition-all text-sm"
+            className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all text-sm dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
           />
           <button type="submit" disabled={addLoading}
-            className="w-full sm:w-auto px-5 py-2.5 bg-black text-white rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-gray-800 transition-all disabled:opacity-60 text-sm">
+            className="w-full sm:w-auto px-5 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-gray-800 dark:hover:bg-gray-200 transition-all disabled:opacity-60 text-sm">
             {addLoading ? <Loader2 size={16} className="animate-spin" /> : <UserPlus size={16} />}
             Agregar
           </button>
@@ -190,29 +190,29 @@ const UserManagement: React.FC = () => {
             {addMsg.text}
           </div>
         )}
-        <p className="text-xs text-gray-400 mt-3">
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
           El usuario debe estar registrado en la plataforma con ese correo.
         </p>
       </div>
 
       {/* ── Invite code ──────────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 md:p-6">
-        <h3 className="font-bold text-gray-800 flex items-center gap-2 mb-1 text-sm md:text-base">
-          <Key size={18} className="text-gray-500 flex-shrink-0" /> Código de invitación temporal
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6">
+        <h3 className="font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2 mb-1 text-sm md:text-base">
+          <Key size={18} className="text-gray-500 dark:text-gray-400 flex-shrink-0" /> Código de invitación temporal
         </h3>
-        <p className="text-xs text-gray-400 mb-5">Válido por 24 horas · Un solo uso · Se elimina automáticamente al ser canjeado</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mb-5">Válido por 24 horas · Un solo uso · Se elimina automáticamente al ser canjeado</p>
 
         {inviteCode ? (
           <div className="space-y-4">
             {/* Code display */}
-            <div className="bg-gray-50 border border-dashed border-gray-300 rounded-xl p-4 md:p-5">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-dashed border-gray-300 rounded-xl p-4 md:p-5">
               <div className="flex items-center gap-2 md:gap-3 mb-3">
-                <span className="flex-1 font-mono text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 tracking-[0.3em] sm:tracking-[0.5em] text-center break-all">
+                <span className="flex-1 font-mono text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-[0.3em] sm:tracking-[0.5em] text-center break-all">
                   {inviteCode.code}
                 </span>
                 <button onClick={handleCopy}
                   className={`p-2.5 rounded-xl border transition-all flex-shrink-0 ${
-                    copied ? 'bg-green-50 border-green-300 text-green-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-100'
+                    copied ? 'bg-green-50 border-green-300 text-green-700' : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:bg-gray-800'
                   }`}>
                   {copied ? <Check size={16} /> : <Copy size={16} />}
                 </button>
@@ -228,23 +228,23 @@ const UserManagement: React.FC = () => {
                     codeExpired ? 'text-red-500'
                     : countdown.startsWith('0') || (!countdown.includes('h') && parseInt(countdown) < 10)
                       ? 'text-orange-500'
-                      : 'text-gray-700'
+                      : 'text-gray-700 dark:text-gray-300'
                   }`}>
                     {codeExpired ? 'EXPIRADO' : `⏱ ${countdown}`}
                   </span>
                 </div>
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-gray-400 dark:text-gray-500">
                   Expira: {new Date(inviteCode.expiresAt).toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' })}
                 </span>
               </div>
             </div>
 
             <div className="flex items-center justify-between">
-              <p className="text-xs text-gray-400 flex items-center gap-1">
+              <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1">
                 <AlertCircle size={11} /> Se elimina de Firestore al ser canjeado
               </p>
               <button onClick={handleGenerateCode} disabled={inviteLoading}
-                className="text-xs text-gray-500 hover:text-gray-800 flex items-center gap-1.5 transition-colors disabled:opacity-50">
+                className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:text-gray-200 flex items-center gap-1.5 transition-colors disabled:opacity-50">
                 {inviteLoading ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
                 Generar nuevo
               </button>
@@ -252,7 +252,7 @@ const UserManagement: React.FC = () => {
           </div>
         ) : (
           <button onClick={handleGenerateCode} disabled={inviteLoading}
-            className="w-full border-2 border-dashed border-gray-200 rounded-xl py-8 flex flex-col items-center gap-2 text-gray-400 hover:border-gray-400 hover:text-gray-600 transition-all">
+            className="w-full border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl py-8 flex flex-col items-center gap-2 text-gray-400 dark:text-gray-500 hover:border-gray-400 hover:text-gray-600 dark:text-gray-400 transition-all">
             {inviteLoading ? <Loader2 size={22} className="animate-spin" /> : <Key size={22} />}
             <span className="text-sm font-semibold">
               {inviteLoading ? 'Generando…' : 'Generar código temporal (24h)'}
@@ -263,12 +263,12 @@ const UserManagement: React.FC = () => {
       </div>
 
       {/* ── Members list ─────────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-4 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-2">
-          <h3 className="font-bold text-gray-800 flex items-center gap-2">
-            <Shield size={18} className="text-gray-500" /> Permisos por usuario
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="px-4 md:px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between gap-2">
+          <h3 className="font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+            <Shield size={18} className="text-gray-500 dark:text-gray-400" /> Permisos por usuario
           </h3>
-          <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full font-semibold">
+          <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2.5 py-1 rounded-full font-semibold">
             {userMembers.length} usuario{userMembers.length !== 1 ? 's' : ''}
           </span>
         </div>
@@ -276,11 +276,11 @@ const UserManagement: React.FC = () => {
         {userMembers.length === 0 ? (
           <div className="py-16 flex flex-col items-center text-gray-300 gap-3">
             <Users size={40} strokeWidth={1} />
-            <p className="text-sm font-medium text-gray-400">No hay usuarios en la organización</p>
+            <p className="text-sm font-medium text-gray-400 dark:text-gray-500">No hay usuarios en la organización</p>
             <p className="text-xs text-gray-300">Agrega usuarios por correo o comparte el código de invitación</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-gray-50 dark:divide-gray-800">
             {userMembers.map(member => {
               const isExpanded = expandedMember === member.uid;
               const localPerms = permState[member.uid] ?? [];
@@ -289,18 +289,18 @@ const UserManagement: React.FC = () => {
               return (
                 <div key={member.uid}>
                   {/* Member header row */}
-                  <div className="px-4 md:px-6 py-3 md:py-4 flex items-start sm:items-center gap-3 hover:bg-gray-50 transition-colors">
-                    <div className="h-9 w-9 md:h-10 md:w-10 rounded-full bg-gray-900 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm">
+                  <div className="px-4 md:px-6 py-3 md:py-4 flex items-start sm:items-center gap-3 hover:bg-gray-50 dark:bg-gray-800 transition-colors">
+                    <div className="h-9 w-9 md:h-10 md:w-10 rounded-full bg-gray-900 flex items-center justify-center text-white dark:text-black font-bold text-sm flex-shrink-0 shadow-sm">
                       {member.email.charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-900 truncate text-sm md:text-base">{member.displayName}</p>
-                      <p className="text-xs text-gray-400 truncate break-all">{member.email}</p>
+                      <p className="font-semibold text-gray-900 dark:text-white truncate text-sm md:text-base">{member.displayName}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 truncate break-all">{member.email}</p>
                       <div className="sm:hidden mt-1">
                         <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
                           member.permissions.length > 0
-                            ? 'bg-gray-900 text-white'
-                            : 'bg-gray-100 text-gray-500'
+                            ? 'bg-gray-900 text-white dark:text-black'
+                            : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
                         }`}>
                           {member.permissions.length}/{ALL_PERMISSIONS.length} permisos
                         </span>
@@ -309,14 +309,14 @@ const UserManagement: React.FC = () => {
                     <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                       <span className={`hidden sm:inline-flex text-xs px-2.5 py-1 rounded-full font-semibold ${
                         member.permissions.length > 0
-                          ? 'bg-gray-900 text-white'
-                          : 'bg-gray-100 text-gray-500'
+                          ? 'bg-gray-900 text-white dark:text-black'
+                          : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
                       }`}>
                         {member.permissions.length}/{ALL_PERMISSIONS.length} permisos
                       </span>
                       <button
                         onClick={() => setExpandedMember(isExpanded ? null : member.uid)}
-                        className="p-1.5 md:p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-all"
+                        className="p-1.5 md:p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:bg-gray-800 hover:text-gray-700 dark:text-gray-300 transition-all"
                       >
                         {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                       </button>
@@ -333,8 +333,8 @@ const UserManagement: React.FC = () => {
 
                   {/* Expanded permissions panel */}
                   {isExpanded && (
-                    <div className="px-4 md:px-6 pb-6 bg-gray-50 border-t border-gray-100">
-                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mt-4 mb-4">
+                    <div className="px-4 md:px-6 pb-6 bg-gray-50 dark:bg-gray-800 border-t border-gray-100 dark:border-gray-800">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider mt-4 mb-4">
                         Permisos de acceso
                       </p>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -347,19 +347,19 @@ const UserManagement: React.FC = () => {
                               onClick={() => togglePerm(member.uid, perm)}
                               className={`group relative text-left px-4 py-3 rounded-xl border transition-all ${
                                 active
-                                  ? 'bg-gray-900 border-gray-800 text-white'
-                                  : 'bg-white border-gray-200 text-gray-600 hover:border-gray-400'
+                                  ? 'bg-gray-900 border-gray-800 text-white dark:text-black'
+                                  : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-400'
                               }`}
                             >
                               <div className="flex items-center gap-3">
                                 <div className={`w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 transition-all ${
-                                  active ? 'bg-white' : 'border-2 border-gray-300'
+                                  active ? 'bg-white dark:bg-gray-900' : 'border-2 border-gray-300'
                                 }`}>
                                   {active && <Check size={12} className="text-black font-black" strokeWidth={3} />}
                                 </div>
                                 <div>
                                   <p className="text-sm font-semibold leading-none">{meta.label}</p>
-                                  <p className={`text-xs mt-0.5 ${active ? 'text-gray-300' : 'text-gray-400'}`}>
+                                  <p className={`text-xs mt-0.5 ${active ? 'text-gray-300' : 'text-gray-400 dark:text-gray-500'}`}>
                                     {meta.description}
                                   </p>
                                 </div>
@@ -373,14 +373,14 @@ const UserManagement: React.FC = () => {
                       <div className="flex items-center gap-2 mt-4">
                         <button
                           onClick={() => setPermState(prev => ({ ...prev, [member.uid]: [...ALL_PERMISSIONS] }))}
-                          className="text-xs text-gray-500 hover:text-gray-800 underline transition-colors"
+                          className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:text-gray-200 underline transition-colors"
                         >
                           Seleccionar todos
                         </button>
                         <span className="text-gray-300">·</span>
                         <button
                           onClick={() => setPermState(prev => ({ ...prev, [member.uid]: [] }))}
-                          className="text-xs text-gray-500 hover:text-gray-800 underline transition-colors"
+                          className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:text-gray-200 underline transition-colors"
                         >
                           Quitar todos
                         </button>
@@ -389,7 +389,7 @@ const UserManagement: React.FC = () => {
                           <button
                             onClick={() => handleSavePerms(member.uid)}
                             disabled={savingPerms === member.uid}
-                            className="px-5 py-2 bg-black text-white rounded-xl text-sm font-bold hover:bg-gray-800 transition-all flex items-center gap-2 disabled:opacity-60"
+                            className="px-5 py-2 bg-black dark:bg-white text-white dark:text-black rounded-xl text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-all flex items-center gap-2 disabled:opacity-60"
                           >
                             {savingPerms === member.uid
                               ? <><Loader2 size={14} className="animate-spin" /> Guardando…</>

@@ -30,14 +30,14 @@ interface FeatureCardProps {
 }
 const FeatureCard: React.FC<FeatureCardProps> = ({ icon: Icon, title, desc, delay }) => (
   <div
-    className="card-hover bg-white rounded-2xl p-6 shadow-sm border border-gray-100 group cursor-default"
+    className="card-hover bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-800 group cursor-default"
     style={{ animation: `slideUp 0.7s ${delay} ease-out both` }}
   >
-    <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-black shadow-lg group-hover:scale-110 transition-transform duration-300">
-      <Icon size={22} className="text-white" />
+    <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-black dark:bg-white shadow-lg group-hover:scale-110 transition-transform duration-300">
+      <Icon size={22} className="text-white dark:text-black" />
     </div>
-    <h3 className="font-bold text-gray-900 text-lg mb-2">{title}</h3>
-    <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
+    <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-2">{title}</h3>
+    <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{desc}</p>
   </div>
 );
 
@@ -52,18 +52,18 @@ interface NewsCardProps {
 }
 const NewsCard: React.FC<NewsCardProps> = ({ badge, badgeBg, title, desc, date, delay }) => (
   <div
-    className="card-hover bg-white rounded-2xl p-6 border border-gray-100 shadow-sm group cursor-default"
+    className="card-hover bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm group cursor-default"
     style={{ animation: `slideUp 0.7s ${delay} ease-out both` }}
   >
     <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide mb-3 ${badgeBg}`}>
       <Sparkles size={10} />
       {badge}
     </div>
-    <h4 className="text-base font-bold text-gray-900 mb-2 group-hover:text-black transition-colors">{title}</h4>
-    <p className="text-gray-500 text-sm leading-relaxed mb-4">{desc}</p>
+    <h4 className="text-base font-bold text-gray-900 dark:text-white mb-2 group-hover:text-black transition-colors">{title}</h4>
+    <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-4">{desc}</p>
     <div className="flex items-center justify-between">
-      <span className="text-xs text-gray-400">{date}</span>
-      <ChevronRight size={14} className="text-gray-300 group-hover:text-gray-700 group-hover:translate-x-1 transition-all" />
+      <span className="text-xs text-gray-400 dark:text-gray-500">{date}</span>
+      <ChevronRight size={14} className="text-gray-300 group-hover:text-gray-700 dark:text-gray-300 group-hover:translate-x-1 transition-all" />
     </div>
   </div>
 );
@@ -91,9 +91,9 @@ const LandingDashboard: React.FC = () => {
   ];
 
   const news = [
-    { badge: 'Nuevo', badgeBg: 'bg-gray-900 text-white', title: 'Módulo de Gastos Automáticos', desc: 'El sistema genera automáticamente registros de gastos basados en el costo de tus ventas.', date: '21 Feb, 2026', delay: '0.15s' },
-    { badge: 'Mejora', badgeBg: 'bg-gray-100 text-gray-700', title: 'Reportes con Gráficos Interactivos', desc: 'Nuevo módulo de reportes con visualizaciones avanzadas y exportación a PDF optimizada.', date: '15 Feb, 2026', delay: '0.3s' },
-    { badge: 'Sistema', badgeBg: 'bg-gray-100 text-gray-700', title: 'Optimización de Rendimiento', desc: 'Mejoras en carga de datos y sincronización con la nube para una experiencia más fluida.', date: '10 Feb, 2026', delay: '0.45s' },
+    { badge: 'Nuevo', badgeBg: 'bg-gray-900 text-white dark:text-black', title: 'Módulo de Gastos Automáticos', desc: 'El sistema genera automáticamente registros de gastos basados en el costo de tus ventas.', date: '21 Feb, 2026', delay: '0.15s' },
+    { badge: 'Mejora', badgeBg: 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300', title: 'Reportes con Gráficos Interactivos', desc: 'Nuevo módulo de reportes con visualizaciones avanzadas y exportación a PDF optimizada.', date: '15 Feb, 2026', delay: '0.3s' },
+    { badge: 'Sistema', badgeBg: 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300', title: 'Optimización de Rendimiento', desc: 'Mejoras en carga de datos y sincronización con la nube para una experiencia más fluida.', date: '10 Feb, 2026', delay: '0.45s' },
   ];
 
   const stats = [
@@ -104,7 +104,7 @@ const LandingDashboard: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-800 font-sans overflow-x-hidden">
 
       {/* ── HERO ─────────────────────────────────────────────────────── */}
       <div className="relative overflow-hidden bg-black">
@@ -203,7 +203,7 @@ const LandingDashboard: React.FC = () => {
               </>
             ) : (
               <button onClick={() => navigate('/workspace')}
-                className="btn-shimmer group flex items-center gap-2 px-8 py-4 bg-white text-black rounded-2xl font-bold text-lg shadow-2xl transition-all hover:scale-105 active:scale-95">
+                className="btn-shimmer group flex items-center gap-2 px-8 py-4 bg-white text-black rounded-2xl font-bold text-lg shadow-2xl transition-all hover:scale-105 active:scale-95 hover:bg-gray-100">
                 Ir al Workspace
                 <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </button>
@@ -229,16 +229,16 @@ const LandingDashboard: React.FC = () => {
       </div>
 
       {/* ── STATS BAR ────────────────────────────────────────────────── */}
-      <div className="bg-white border-b border-gray-100 shadow-sm">
+      <div className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-2 md:grid-cols-4 gap-6">
           {stats.map(({ value, label, icon: Icon }, i) => (
             <div key={label} className="flex flex-col items-center text-center group"
               style={{ animation: `slideUp 0.6s ${0.1 * i}s ease-out both` }}>
-              <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center mb-2 group-hover:bg-black transition-colors duration-300">
-                <Icon size={18} className="text-gray-700 group-hover:text-white transition-colors duration-300" />
+              <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-2 group-hover:bg-black dark:bg-white transition-colors duration-300">
+                <Icon size={18} className="text-gray-700 dark:text-gray-300 group-hover:text-white dark:text-black transition-colors duration-300" />
               </div>
-              <p className="text-2xl font-black text-black">{value}</p>
-              <p className="text-gray-500 text-sm">{label}</p>
+              <p className="text-2xl font-black text-black dark:text-white">{value}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">{label}</p>
             </div>
           ))}
         </div>
@@ -247,11 +247,11 @@ const LandingDashboard: React.FC = () => {
       {/* ── FEATURES GRID ────────────────────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center mb-14" style={{ animation: 'slideUp 0.7s ease-out both' }}>
-          <span className="inline-flex items-center gap-2 bg-gray-100 text-gray-800 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
+          <span className="inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
             <Zap size={14} />Funcionalidades
           </span>
-          <h2 className="text-4xl font-black text-gray-900 mb-3">Todo lo que necesitas</h2>
-          <p className="text-gray-500 text-lg max-w-xl mx-auto">Una plataforma completa para gestionar cada aspecto de tu empresa.</p>
+          <h2 className="text-4xl font-black text-gray-900 dark:text-white mb-3">Todo lo que necesitas</h2>
+          <p className="text-gray-500 dark:text-gray-400 text-lg max-w-xl mx-auto">Una plataforma completa para gestionar cada aspecto de tu empresa.</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map(f => <FeatureCard key={f.title} {...f} />)}
@@ -259,14 +259,14 @@ const LandingDashboard: React.FC = () => {
       </section>
 
       {/* ── NEWS / UPDATES ───────────────────────────────────────────── */}
-      <section className="bg-gray-50 border-t border-gray-100 py-20">
+      <section className="bg-gray-50 dark:bg-gray-800 border-t border-gray-100 dark:border-gray-800 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12" style={{ animation: 'slideUp 0.7s ease-out both' }}>
-            <span className="inline-flex items-center gap-2 bg-white text-gray-700 text-sm font-semibold px-4 py-1.5 rounded-full border border-gray-200 mb-4 shadow-sm">
+            <span className="inline-flex items-center gap-2 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 text-sm font-semibold px-4 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 mb-4 shadow-sm">
               <Receipt size={14} />Novedades
             </span>
-            <h2 className="text-3xl font-black text-gray-900 mb-2">Actualizaciones recientes</h2>
-            <p className="text-gray-500">Siempre mejorando para ofrecerte la mejor experiencia.</p>
+            <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-2">Actualizaciones recientes</h2>
+            <p className="text-gray-500 dark:text-gray-400">Siempre mejorando para ofrecerte la mejor experiencia.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {news.map(n => <NewsCard key={n.title} {...n} />)}
@@ -276,7 +276,7 @@ const LandingDashboard: React.FC = () => {
 
       {/* ── CTA BOTTOM ───────────────────────────────────────────────── */}
       {!user && (
-        <section className="py-20 bg-white">
+        <section className="py-20 bg-white dark:bg-gray-900">
           <div className="max-w-3xl mx-auto px-4 text-center">
             <div className="relative rounded-3xl p-12 overflow-hidden shadow-2xl bg-black">
               {/* Decoration */}
@@ -292,7 +292,7 @@ const LandingDashboard: React.FC = () => {
               <h2 className="text-4xl font-black text-white mb-4">¿Listo para empezar?</h2>
               <p className="text-gray-400 text-lg mb-8">Únete a cientos de empresas que ya optimizaron su facturación con IA.</p>
               <button onClick={() => navigate('/login')}
-                className="btn-shimmer inline-flex items-center gap-3 px-8 py-4 bg-white text-black rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all">
+                className="btn-shimmer inline-flex items-center gap-3 px-8 py-4 bg-white text-black rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all hover:bg-gray-100">
                 <LogIn size={20} />
                 Crear cuenta gratis
                 <ArrowRight size={18} />
@@ -303,18 +303,18 @@ const LandingDashboard: React.FC = () => {
       )}
 
       {/* ── FOOTER ───────────────────────────────────────────────────── */}
-      <footer className="bg-black text-gray-500 py-10">
+      <footer className="bg-black text-gray-500 dark:text-gray-400 py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-white flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-white dark:bg-gray-900 flex items-center justify-center">
               <LayoutDashboard size={14} className="text-black" />
             </div>
-            <span className="font-bold text-white">Facturador AI</span>
-            <span className="text-xs text-gray-600">v1.0</span>
+            <span className="font-bold text-white dark:text-black">Facturador AI</span>
+            <span className="text-xs text-gray-600 dark:text-gray-400">v1.0</span>
           </div>
-          <p className="text-sm text-gray-600">© 2026 Facturador AI. Todos los derechos reservados.</p>
-          <div className="flex items-center gap-2 text-xs text-gray-400">
-            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+          <p className="text-sm text-gray-600 dark:text-gray-400">© 2026 Facturador AI. Todos los derechos reservados.</p>
+          <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+            <div className="w-2 h-2 rounded-full bg-white dark:bg-gray-900 animate-pulse" />
             Sistema operativo
           </div>
         </div>

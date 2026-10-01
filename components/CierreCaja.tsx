@@ -128,18 +128,18 @@ const CierreCaja: React.FC<CierreCajaProps> = ({ invoices }) => {
       {/* ── Page Header ── */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
             <Lock size={26} className="text-black" />
             Cierre de Caja
           </h2>
-          <p className="text-gray-500 text-sm mt-1">
+          <p className="text-gray-500 dark:text-gray-400 dark:text-gray-400 text-sm mt-1">
             Genera un reporte de cierre con todas las transacciones del período seleccionado.
           </p>
         </div>
         {generated && filtered.length > 0 && (
           <button
             onClick={handlePrint}
-            className="flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-xl font-semibold text-sm hover:bg-gray-800 transition-all shadow-lg active:scale-95"
+            className="flex items-center gap-2 px-5 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm hover:bg-gray-800 dark:hover:bg-gray-200 transition-all shadow-lg active:scale-95"
           >
             <Printer size={16} /> Imprimir / PDF
           </button>
@@ -147,13 +147,13 @@ const CierreCaja: React.FC<CierreCajaProps> = ({ invoices }) => {
       </div>
 
       {/* ── Filter Card ── */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 md:p-6">
-        <h3 className="font-bold text-gray-800 text-sm md:text-base mb-4 flex items-center gap-2">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-4 md:p-6">
+        <h3 className="font-bold text-gray-800 dark:text-gray-200 text-sm md:text-base mb-4 flex items-center gap-2">
           <Calendar size={18} /> Seleccionar Período
         </h3>
         <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
           <div className="flex-1">
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 dark:text-gray-400 uppercase tracking-wider mb-1.5">
               Fecha Desde
             </label>
             <input
@@ -161,11 +161,11 @@ const CierreCaja: React.FC<CierreCajaProps> = ({ invoices }) => {
               value={dateFrom}
               max={dateTo}
               onChange={e => { setDateFrom(e.target.value); setGenerated(false); }}
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
             />
           </div>
           <div className="flex-1">
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 dark:text-gray-400 uppercase tracking-wider mb-1.5">
               Fecha Hasta
             </label>
             <input
@@ -173,19 +173,19 @@ const CierreCaja: React.FC<CierreCajaProps> = ({ invoices }) => {
               value={dateTo}
               min={dateFrom}
               onChange={e => { setDateTo(e.target.value); setGenerated(false); }}
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
             />
           </div>
           <button
             onClick={() => setGenerated(true)}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-black text-white rounded-xl font-bold text-sm hover:bg-gray-800 active:scale-95 transition-all shadow-md whitespace-nowrap"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-bold text-sm hover:bg-gray-800 dark:hover:bg-gray-200 active:scale-95 transition-all shadow-md whitespace-nowrap"
           >
             <Lock size={16} /> Generar Cierre
           </button>
           {generated && (
             <button
               onClick={() => setGenerated(false)}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 text-gray-500 rounded-xl font-medium text-sm hover:border-gray-400 hover:text-gray-800 transition-all"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 dark:text-gray-400 rounded-xl font-medium text-sm hover:border-gray-400 hover:text-gray-800 dark:text-gray-200 transition-all dark:bg-gray-800"
             >
               <X size={16} /> Limpiar
             </button>
@@ -204,36 +204,36 @@ const CierreCaja: React.FC<CierreCajaProps> = ({ invoices }) => {
               { label: 'IVA Cobrado', value: fmt(totalImpuesto), icon: Hash, sub: 'Impuesto de ventas' },
               { label: 'Por Cobrar', value: fmt(totalPendiente), icon: Clock, sub: 'Saldo pendiente' },
             ].map(({ label, value, icon: Icon, sub }) => (
-              <div key={label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div key={label} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-5">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{label}</span>
-                  <div className="h-8 w-8 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center">
+                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-400 uppercase tracking-wider">{label}</span>
+                  <div className="h-8 w-8 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-800 flex items-center justify-center">
                     <Icon size={16} className="text-black" />
                   </div>
                 </div>
-                <p className="text-xl font-black text-gray-900 leading-none">{value}</p>
-                <p className="text-xs text-gray-400 mt-1.5">{sub}</p>
+                <p className="text-xl font-black text-gray-900 dark:text-white leading-none">{value}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-400 mt-1.5">{sub}</p>
               </div>
             ))}
           </div>
 
           {/* Payment method breakdown */}
           {byMethod.length > 0 && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-              <h3 className="font-bold text-gray-800 text-sm mb-4 flex items-center gap-2">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-6">
+              <h3 className="font-bold text-gray-800 dark:text-gray-200 text-sm mb-4 flex items-center gap-2">
                 <CreditCard size={16} /> Desglose por Método de Pago
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 {byMethod.map(([method, amount]) => {
                   const Icon = paymentIcon[method] ?? Wallet;
                   return (
-                    <div key={method} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                      <div className="h-8 w-8 rounded-lg bg-black flex items-center justify-center flex-shrink-0">
-                        <Icon size={14} className="text-white" />
+                    <div key={method} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-800">
+                      <div className="h-8 w-8 rounded-lg bg-black dark:bg-white flex items-center justify-center flex-shrink-0">
+                        <Icon size={14} className="text-white dark:text-black" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-semibold text-gray-500 truncate">{method}</p>
-                        <p className="text-sm font-black text-gray-900">{fmt(amount)}</p>
+                        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 dark:text-gray-400 truncate">{method}</p>
+                        <p className="text-sm font-black text-gray-900 dark:text-white">{fmt(amount)}</p>
                       </div>
                     </div>
                   );
@@ -295,22 +295,22 @@ const CierreCaja: React.FC<CierreCajaProps> = ({ invoices }) => {
             </div>
 
             {/* ── Transaction Table (screen + print) ── */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                <h3 className="font-bold text-gray-800 flex items-center gap-2">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                <h3 className="font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
                   <FileText size={17} />
                   Detalle de Transacciones
-                  <span className="ml-2 text-xs bg-gray-100 text-gray-600 font-bold px-2 py-0.5 rounded-full">
+                  <span className="ml-2 text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 dark:text-gray-400 font-bold px-2 py-0.5 rounded-full">
                     {filtered.length}
                   </span>
                 </h3>
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-gray-400 dark:text-gray-400">
                   {dateFrom === dateTo ? fmtDate(dateFrom) : `${dateFrom} → ${dateTo}`}
                 </span>
               </div>
 
               {filtered.length === 0 ? (
-                <div className="py-20 flex flex-col items-center justify-center text-gray-400 gap-3">
+                <div className="py-20 flex flex-col items-center justify-center text-gray-400 dark:text-gray-400 gap-3">
                   <ShoppingCart size={40} className="opacity-30" />
                   <p className="font-semibold">No hay transacciones para este período.</p>
                   <p className="text-sm">Selecciona otro rango de fechas.</p>
@@ -354,9 +354,9 @@ const CierreCaja: React.FC<CierreCajaProps> = ({ invoices }) => {
                   </table>
 
                   {/* ── SCREEN cards ── */}
-                  <div className="divide-y divide-gray-50">
+                  <div className="divide-y divide-gray-50 dark:divide-gray-800">
                     {/* header row */}
-                    <div className="hidden sm:grid grid-cols-[auto_1fr_1.5fr_1fr_auto_auto_auto] gap-4 px-6 py-3 bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    <div className="hidden sm:grid grid-cols-[auto_1fr_1.5fr_1fr_auto_auto_auto] gap-4 px-6 py-3 bg-gray-50 dark:bg-gray-800 text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-400 uppercase tracking-wider">
                       <span>N° Fact.</span>
                       <span>Fecha</span>
                       <span>Cliente</span>
@@ -373,28 +373,28 @@ const CierreCaja: React.FC<CierreCajaProps> = ({ invoices }) => {
                       const isExpanded = expandedId === inv.id;
 
                       return (
-                        <div key={inv.id} className="hover:bg-gray-50/80 transition-colors">
+                        <div key={inv.id} className="hover:bg-gray-50 dark:bg-gray-800/80 transition-colors">
                           {/* Main row */}
                           <div
                             className="grid grid-cols-[auto_1fr] sm:grid-cols-[auto_1fr_1.5fr_1fr_auto_auto_auto] gap-4 px-6 py-4 cursor-pointer items-center"
                             onClick={() => setExpandedId(isExpanded ? null : inv.id)}
                           >
                             {/* Invoice # */}
-                            <span className="font-black text-gray-900 text-sm font-mono bg-gray-100 px-2 py-0.5 rounded-lg">
+                            <span className="font-black text-gray-900 dark:text-white text-sm font-mono bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-lg">
                               #{inv.number}
                             </span>
                             {/* Date */}
-                            <span className="text-sm text-gray-600">
+                            <span className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400">
                               {inv.date}
-                              {inv.time && <span className="text-gray-400 ml-1">· {inv.time}</span>}
+                              {inv.time && <span className="text-gray-400 dark:text-gray-400 ml-1">· {inv.time}</span>}
                             </span>
                             {/* Customer */}
-                            <span className="hidden sm:block text-sm font-semibold text-gray-900 truncate">
+                            <span className="hidden sm:block text-sm font-semibold text-gray-900 dark:text-white truncate">
                               {inv.customerName}
                             </span>
                             {/* Method */}
-                            <span className="hidden sm:flex items-center gap-1.5 text-sm text-gray-600">
-                              <PMIcon size={14} className="text-gray-400" />
+                            <span className="hidden sm:flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400">
+                              <PMIcon size={14} className="text-gray-400 dark:text-gray-400" />
                               {inv.paymentMethod ?? '—'}
                             </span>
                             {/* Status */}
@@ -402,41 +402,41 @@ const CierreCaja: React.FC<CierreCajaProps> = ({ invoices }) => {
                               <StatusIcon size={11} />{sm.label}
                             </span>
                             {/* Total */}
-                            <span className="text-right font-black text-gray-900 text-sm ml-auto sm:ml-0">
+                            <span className="text-right font-black text-gray-900 dark:text-white text-sm ml-auto sm:ml-0">
                               {fmt(inv.total, inv.currency)}
                             </span>
                             {/* Expand */}
-                            <span className="text-gray-400">
+                            <span className="text-gray-400 dark:text-gray-400">
                               {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                             </span>
                           </div>
 
                           {/* Expanded items */}
                           {isExpanded && (
-                            <div className="mx-6 mb-4 rounded-xl border border-gray-100 bg-gray-50 overflow-hidden">
-                              <div className="px-4 py-2 bg-gray-100 flex items-center justify-between">
-                                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                            <div className="mx-6 mb-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 overflow-hidden">
+                              <div className="px-4 py-2 bg-gray-100 dark:bg-gray-800 flex items-center justify-between">
+                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-400 uppercase tracking-wider">
                                   Productos / Servicios
                                 </span>
-                                <span className="text-xs text-gray-400">{inv.items.length} ítem(s)</span>
+                                <span className="text-xs text-gray-400 dark:text-gray-400">{inv.items.length} ítem(s)</span>
                               </div>
-                              <div className="divide-y divide-gray-100">
+                              <div className="divide-y divide-gray-100 dark:divide-gray-800">
                                 {inv.items.map((item, idx) => (
                                   <div key={idx} className="px-4 py-2.5 flex items-center justify-between gap-4">
                                     <div className="flex-1 min-w-0">
-                                      <p className="text-sm font-semibold text-gray-800 truncate">{item.productName}</p>
+                                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">{item.productName}</p>
                                       {item.description && (
-                                        <p className="text-xs text-gray-400 truncate">{item.description}</p>
+                                        <p className="text-xs text-gray-400 dark:text-gray-400 truncate">{item.description}</p>
                                       )}
                                     </div>
                                     <div className="flex items-center gap-4 text-sm text-right flex-shrink-0">
-                                      <span className="text-gray-500">
+                                      <span className="text-gray-500 dark:text-gray-400 dark:text-gray-400">
                                         {item.quantity} × {fmt(item.price, inv.currency)}
                                       </span>
                                       {item.discount ? (
                                         <span className="text-red-500 text-xs">-{item.discount}%</span>
                                       ) : null}
-                                      <span className="font-bold text-gray-900 w-28">
+                                      <span className="font-bold text-gray-900 dark:text-white w-28">
                                         {fmt(item.total, inv.currency)}
                                       </span>
                                     </div>
@@ -444,10 +444,10 @@ const CierreCaja: React.FC<CierreCajaProps> = ({ invoices }) => {
                                 ))}
                               </div>
                               {/* Invoice sub-totals */}
-                              <div className="px-4 py-2.5 bg-gray-100 grid grid-cols-3 gap-2 text-xs font-semibold text-gray-600">
+                              <div className="px-4 py-2.5 bg-gray-100 dark:bg-gray-800 grid grid-cols-3 gap-2 text-xs font-semibold text-gray-600 dark:text-gray-400 dark:text-gray-400">
                                 <span>Subtotal: {fmt(inv.subtotal, inv.currency)}</span>
                                 <span>IVA: {fmt(inv.tax, inv.currency)}</span>
-                                <span className="font-black text-gray-900 text-right">
+                                <span className="font-black text-gray-900 dark:text-white text-right">
                                   Total: {fmt(inv.total, inv.currency)}
                                 </span>
                               </div>
@@ -459,17 +459,17 @@ const CierreCaja: React.FC<CierreCajaProps> = ({ invoices }) => {
 
                     {/* Summary footer row */}
                     <div className="px-6 py-4 bg-gray-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                      <span className="text-white font-black text-sm uppercase tracking-widest">
+                      <span className="text-white dark:text-black font-black text-sm uppercase tracking-widest">
                         Total General · {filtered.length} factura(s)
                       </span>
                       <div className="flex items-center gap-6 text-sm">
-                        <span className="text-gray-400">
-                          Subtotal: <span className="text-white font-bold">{fmt(totalSubtotal)}</span>
+                        <span className="text-gray-400 dark:text-gray-400">
+                          Subtotal: <span className="text-white dark:text-black font-bold">{fmt(totalSubtotal)}</span>
                         </span>
-                        <span className="text-gray-400">
-                          IVA: <span className="text-white font-bold">{fmt(totalImpuesto)}</span>
+                        <span className="text-gray-400 dark:text-gray-400">
+                          IVA: <span className="text-white dark:text-black font-bold">{fmt(totalImpuesto)}</span>
                         </span>
-                        <span className="text-white font-black text-base">
+                        <span className="text-white dark:text-black font-black text-base">
                           {fmt(totalVentas)}
                         </span>
                       </div>
@@ -512,21 +512,21 @@ const CierreCaja: React.FC<CierreCajaProps> = ({ invoices }) => {
 
           {/* Action bar */}
           {filtered.length > 0 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white border border-gray-100 rounded-2xl px-6 py-4 shadow-sm">
-              <div className="text-sm text-gray-500">
-                <span className="font-semibold text-gray-900">{filtered.length} transacciones</span> · Total:{' '}
-                <span className="font-black text-gray-900">{fmt(totalVentas)}</span>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl px-6 py-4 shadow-sm">
+              <div className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-400">
+                <span className="font-semibold text-gray-900 dark:text-white">{filtered.length} transacciones</span> · Total:{' '}
+                <span className="font-black text-gray-900 dark:text-white">{fmt(totalVentas)}</span>
               </div>
               <div className="flex gap-3">
                 <button
                   onClick={handlePrint}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-xl font-semibold text-sm hover:bg-gray-800 transition-all active:scale-95 shadow-md"
+                  className="flex items-center gap-2 px-5 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm hover:bg-gray-800 dark:hover:bg-gray-200 transition-all active:scale-95 shadow-md"
                 >
                   <Printer size={16} /> Imprimir
                 </button>
                 <button
                   onClick={handlePrint}
-                  className="flex items-center gap-2 px-5 py-2.5 border border-gray-200 text-gray-700 rounded-xl font-semibold text-sm hover:border-gray-400 hover:text-gray-900 transition-all"
+                  className="flex items-center gap-2 px-5 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm hover:border-gray-400 hover:text-gray-900 dark:text-white transition-all dark:bg-gray-800"
                 >
                   <Download size={16} /> Exportar PDF
                 </button>

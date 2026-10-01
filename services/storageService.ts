@@ -1,5 +1,5 @@
 
-import { Product, Customer, Invoice, AppSettings, InvoiceItem, Expense, Payment, InventoryAudit } from '../types';
+import { Product, Customer, Invoice, AppSettings, InvoiceItem, Expense, Payment, InventoryAudit, Quote, LabOrder, DailyEntry } from '../types';
 import { db } from './firebase';
 import {
   collection,
@@ -27,6 +27,9 @@ const COLLECTIONS = {
   EXPENSES:         'expenses',
   SETTINGS:         'settings',
   INVENTORY_AUDITS: 'inventoryAudits',
+  QUOTES:           'quotes',
+  LAB_ORDERS:       'labOrders',
+  DAILY_ENTRIES:    'dailyEntries',
 };
 
 /** Returns a Firestore collection reference scoped to the active organization */
@@ -261,6 +264,27 @@ export const StorageService = {
     await deleteDoc(orgDoc(orgId, COLLECTIONS.EXPENSES, id));
   },
 
+  // Daily Entries (metas de venta)
+  getDailyEntries: async (orgId?: string): Promise<DailyEntry[]> => {
+    if (!db || !orgId) {
+      return ls.get<DailyEntry>(COLLECTIONS.DAILY_ENTRIES)
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }
+    const snap = await getDocs(orgCol(orgId, COLLECTIONS.DAILY_ENTRIES));
+    return snapshotToData<DailyEntry>(snap)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  },
+
+  saveDailyEntry: async (entry: DailyEntry, orgId?: string) => {
+    if (!db || !orgId) return ls.add(COLLECTIONS.DAILY_ENTRIES, entry);
+    await setDoc(orgDoc(orgId, COLLECTIONS.DAILY_ENTRIES, entry.id), entry);
+  },
+
+  deleteDailyEntry: async (id: string, orgId?: string) => {
+    if (!db || !orgId) return ls.delete(COLLECTIONS.DAILY_ENTRIES, id);
+    await deleteDoc(orgDoc(orgId, COLLECTIONS.DAILY_ENTRIES, id));
+  },
+
   // Settings
   getSettings: async (orgId?: string): Promise<AppSettings> => {
     if (!db || !orgId) {
@@ -300,6 +324,67 @@ export const StorageService = {
   saveInventoryAudit: async (audit: InventoryAudit, orgId?: string): Promise<void> => {
     if (!db || !orgId) return ls.add(COLLECTIONS.INVENTORY_AUDITS, audit);
     await setDoc(orgDoc(orgId, COLLECTIONS.INVENTORY_AUDITS, audit.id), audit);
+  },
+
+  // Quotes
+  getQuotes: async (orgId?: string): Promise<Quote[]> => {
+    if (!db || !orgId) {
+      return ls.get<Quote>(COLLECTIONS.QUOTES)
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }
+    const snap = await getDocs(orgCol(orgId, COLLECTIONS.QUOTES));
+    return snapshotToData<Quote>(snap)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  },
+
+  saveQuote: async (quote: Quote, orgId?: string): Promise<void> => {
+    if (!db || !orgId) return ls.add(COLLECTIONS.QUOTES, quote);
+    await setDoc(orgDoc(orgId, COLLECTIONS.QUOTES, quote.id), quote);
+  },
+
+  updateQuoteStatus: async (quoteId: string, status: Quote['status'], orgId?: string, convertedInvoiceId?: string): Promise<void> => {
+    if (!db || !orgId) {
+      const quotes = ls.get<Quote>(COLLECTIONS.QUOTES);
+      const idx = quotes.findIndex(q => q.id === quoteId);
+      if (idx >= 0) {
+        quotes[idx].status = status;
+        if (convertedInvoiceId) quotes[idx].convertedInvoiceId = convertedInvoiceId;
+        ls.set(COLLECTIONS.QUOTES, quotes);
+      }
+      return;
+    }
+    const data: any = { status };
+    if (convertedInvoiceId) data.convertedInvoiceId = convertedInvoiceId;
+    await updateDoc(orgDoc(orgId, COLLECTIONS.QUOTES, quoteId), data);
+  },
+
+  // Lab Orders
+  getLabOrders: async (orgId?: string): Promise<LabOrder[]> => {
+    if (!db || !orgId) {
+      return ls.get<LabOrder>(COLLECTIONS.LAB_ORDERS)
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }
+    const snap = await getDocs(orgCol(orgId, COLLECTIONS.LAB_ORDERS));
+    return snapshotToData<LabOrder>(snap)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  },
+
+  saveLabOrder: async (order: LabOrder, orgId?: string): Promise<void> => {
+    if (!db || !orgId) return ls.add(COLLECTIONS.LAB_ORDERS, order);
+    await setDoc(orgDoc(orgId, COLLECTIONS.LAB_ORDERS, order.id), order);
+  },
+
+  updateLabOrderStatus: async (orderId: string, status: LabOrder['status'], orgId?: string): Promise<void> => {
+    if (!db || !orgId) {
+      const orders = ls.get<LabOrder>(COLLECTIONS.LAB_ORDERS);
+      const idx = orders.findIndex(o => o.id === orderId);
+      if (idx >= 0) {
+        orders[idx].status = status;
+        ls.set(COLLECTIONS.LAB_ORDERS, orders);
+      }
+      return;
+    }
+    await updateDoc(orgDoc(orgId, COLLECTIONS.LAB_ORDERS, orderId), { status });
   },
 
   // Seed demo data

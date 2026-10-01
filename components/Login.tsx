@@ -87,10 +87,10 @@ const Login: React.FC = () => {
           <LayoutDashboard size={28} className="text-gray-300" />
         </div>
         <div className="absolute bottom-32 left-16 border border-white/15 bg-white/5 rounded-2xl p-4 animate-float-alt shadow-2xl">
-          <Shield size={24} className="text-gray-400" />
+          <Shield size={24} className="text-gray-400 dark:text-gray-500" />
         </div>
         <div className="absolute top-1/2 right-8 border border-white/10 bg-white/5 rounded-2xl p-3 animate-float-slow shadow-xl">
-          <Sparkles size={20} className="text-gray-400" />
+          <Sparkles size={20} className="text-gray-400 dark:text-gray-500" />
         </div>
 
         {/* Main left content */}
@@ -119,7 +119,7 @@ const Login: React.FC = () => {
               más inteligente
             </span>
           </h2>
-          <p className="text-gray-400 text-lg leading-relaxed max-w-md mb-10">
+          <p className="text-gray-400 dark:text-gray-500 text-lg leading-relaxed max-w-md mb-10">
             Gestiona facturación, inventario y clientes con el poder de la inteligencia artificial.
           </p>
 
@@ -142,10 +142,10 @@ const Login: React.FC = () => {
       </div>
 
       {/* ── RIGHT PANEL (form) ───────────────────────────────────────── */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 relative bg-gray-50 overflow-y-auto">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 relative bg-gray-50 dark:bg-gray-800 overflow-y-auto">
         {/* Back button */}
         <button onClick={() => navigate('/')}
-          className="absolute top-4 left-4 sm:top-6 sm:left-6 flex items-center gap-1.5 sm:gap-2 bg-white border border-gray-200 text-gray-600 hover:text-black px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl transition-all text-xs sm:text-sm font-medium shadow-sm hover:shadow-md">
+          className="absolute top-4 left-4 sm:top-6 sm:left-6 flex items-center gap-1.5 sm:gap-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:text-black px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl transition-all text-xs sm:text-sm font-medium shadow-sm hover:shadow-md">
           <ArrowLeft size={14} className="sm:w-4 sm:h-4" />Inicio
         </button>
 
@@ -153,14 +153,14 @@ const Login: React.FC = () => {
 
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center justify-center gap-2 sm:gap-3 mb-6 sm:mb-8">
-            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-black flex items-center justify-center shadow-xl flex-shrink-0">
-              <LayoutDashboard size={20} className="text-white sm:w-[22px] sm:h-[22px]" />
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-black dark:bg-white flex items-center justify-center shadow-xl flex-shrink-0">
+              <LayoutDashboard size={20} className="text-white dark:text-black sm:w-[22px] sm:h-[22px]" />
             </div>
-            <h1 className="text-lg sm:text-xl font-black text-gray-900 truncate">Facturador AI</h1>
+            <h1 className="text-lg sm:text-xl font-black text-gray-900 dark:text-white truncate">Facturador AI</h1>
           </div>
 
           {/* Card */}
-          <div className="rounded-3xl overflow-hidden shadow-2xl bg-white border border-gray-100">
+          <div className="rounded-3xl overflow-hidden shadow-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
 
             {/* Card header — black */}
             <div className="relative p-6 sm:p-8 overflow-hidden bg-black">
@@ -174,7 +174,7 @@ const Login: React.FC = () => {
                 style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
 
               <div className="relative">
-                <p className="text-gray-500 text-sm font-medium mb-1">
+                <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">
                   {isRegistering ? 'Crear una cuenta nueva' : 'Bienvenido de nuevo'}
                 </p>
                 <h2 className="text-xl sm:text-2xl font-black text-white">
@@ -189,45 +189,45 @@ const Login: React.FC = () => {
 
                 {/* Error */}
                 {error && (
-                  <div className="flex items-start gap-3 p-4 bg-gray-50 text-gray-900 rounded-xl border border-gray-200 animate-fade-in">
-                    <AlertCircle size={16} className="mt-0.5 flex-shrink-0 text-gray-500" />
+                  <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl border border-gray-200 dark:border-gray-700 animate-fade-in">
+                    <AlertCircle size={16} className="mt-0.5 flex-shrink-0 text-gray-500 dark:text-gray-400" />
                     <p className="text-sm font-medium">{error}</p>
                   </div>
                 )}
 
                 {/* Email */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Correo electrónico</label>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Correo electrónico</label>
                   <div className="relative group">
                     <Mail size={17}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-black transition-colors" />
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within:text-black transition-colors" />
                     <input type="email" required value={email}
                       onChange={e => setEmail(e.target.value)}
                       placeholder="usuario@empresa.com"
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black focus:bg-white transition-all text-sm" />
+                      className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black focus:bg-white dark:bg-gray-900 transition-all text-sm" />
                   </div>
                 </div>
 
                 {/* Password */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Contraseña</label>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Contraseña</label>
                   <div className="relative group">
                     <Lock size={17}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-black transition-colors" />
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within:text-black transition-colors" />
                     <input type={showPassword ? 'text' : 'password'} required value={password}
                       onChange={e => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full pl-10 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black focus:bg-white transition-all text-sm" />
+                      className="w-full pl-10 pr-12 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black focus:bg-white dark:bg-gray-900 transition-all text-sm" />
                     <button type="button" onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors">
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:text-gray-300 transition-colors">
                       {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                     </button>
                   </div>
 
                   {/* Password requirements — only shown during registration */}
                   {isRegistering && (
-                    <div className="mt-3 p-3.5 bg-gray-50 border border-gray-200 rounded-xl space-y-2">
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Requisitos de contraseña</p>
+                    <div className="mt-3 p-3.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl space-y-2">
+                      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Requisitos de contraseña</p>
                       {[
                         { label: 'Mínimo 8 caracteres', met: password.length >= 8 },
                         { label: 'Al menos una letra mayúscula', met: /[A-Z]/.test(password) },
@@ -245,7 +245,7 @@ const Login: React.FC = () => {
                               ? <Check size={10} color="#ffffff" strokeWidth={3} />
                               : <X size={8} color="#9ca3af" strokeWidth={3} />}
                           </span>
-                          <span className={`text-xs transition-colors duration-300 ${met ? 'text-gray-900 font-medium' : 'text-gray-400'
+                          <span className={`text-xs transition-colors duration-300 ${met ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-400 dark:text-gray-500'
                             }`}>{label}</span>
                         </div>
                       ))}
@@ -255,7 +255,7 @@ const Login: React.FC = () => {
 
                 {/* Submit */}
                 <button type="submit" disabled={isLoading}
-                  className="btn-shimmer w-full flex justify-center items-center gap-2.5 py-3.5 bg-black text-white rounded-xl font-bold transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg hover:bg-gray-900 hover:shadow-xl">
+                  className="btn-shimmer w-full flex justify-center items-center gap-2.5 py-3.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-bold transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg hover:bg-gray-900 hover:shadow-xl">
                   {isLoading ? (
                     <><Loader2 size={18} className="animate-spin" />Procesando...</>
                   ) : isRegistering ? (
@@ -269,21 +269,21 @@ const Login: React.FC = () => {
                 <div className="text-center pt-1">
                   <button type="button"
                     onClick={() => { setError(''); setIsRegistering(!isRegistering); }}
-                    className="text-sm text-gray-500 hover:text-black transition-colors font-medium">
+                    className="text-sm text-gray-500 dark:text-gray-400 hover:text-black transition-colors font-medium">
                     {isRegistering ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate'}
                   </button>
                 </div>
               </form>
 
               {/* Security note */}
-              <div className="mt-6 pt-5 border-t border-gray-100 flex items-center justify-center gap-2 text-xs text-gray-400">
-                <Shield size={12} className="text-gray-400" />
+              <div className="mt-6 pt-5 border-t border-gray-100 dark:border-gray-800 flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+                <Shield size={12} className="text-gray-400 dark:text-gray-500" />
                 <span>Conexión cifrada y datos protegidos</span>
               </div>
             </div>
           </div>
 
-          <p className="text-center text-gray-400 text-xs mt-6">
+          <p className="text-center text-gray-400 dark:text-gray-500 text-xs mt-6">
             © 2026 Facturador AI. Todos los derechos reservados.
           </p>
         </div>

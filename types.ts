@@ -96,6 +96,16 @@ export interface HaciendaConfig {
   environment: 'staging' | 'production';
 }
 
+export interface LensGama {
+  id: string;
+  label: string;
+  order: number;
+  description: string;
+  benefits: string[];
+  adaptationTime?: string;
+  linkedProductId?: string;
+}
+
 export interface AppSettings {
   companyName: string;
   commercialName?: string;
@@ -112,6 +122,8 @@ export interface AppSettings {
   canton?: string;
   district?: string;
   hacienda?: HaciendaConfig;
+  lensGamas?: LensGama[];
+  monthlyGoalTarget?: number; // meta mensual de ventas (ingresos) en moneda principal
 }
 
 // ── Multi-org & Permissions ────────────────────────────────────────────────
@@ -126,7 +138,11 @@ export type Permission =
   | 'view_reports'
   | 'view_cierre'
   | 'manage_settings'
-  | 'manage_users';
+  | 'manage_users'
+  | 'manage_quotes'
+  | 'use_lens_simulation'
+  | 'manage_lab_orders'
+  | 'manage_goals';
 
 export const ALL_PERMISSIONS: Permission[] = [
   'view_dashboard',
@@ -139,6 +155,10 @@ export const ALL_PERMISSIONS: Permission[] = [
   'view_cierre',
   'manage_settings',
   'manage_users',
+  'manage_quotes',
+  'use_lens_simulation',
+  'manage_lab_orders',
+  'manage_goals',
 ];
 
 export const PERMISSION_LABELS: Record<Permission, { label: string; description: string }> = {
@@ -152,6 +172,10 @@ export const PERMISSION_LABELS: Record<Permission, { label: string; description:
   view_cierre:       { label: 'Cierre de Caja',          description: 'Generar y ver cierres de caja.' },
   manage_settings:   { label: 'Configuración',           description: 'Modificar la configuración de la empresa.' },
   manage_users:      { label: 'Gestionar Usuarios',      description: 'Agregar usuarios y administrar permisos.' },
+  manage_quotes:     { label: 'Gestionar Cotizaciones',  description: 'Crear, ver y convertir cotizaciones en facturas.' },
+  use_lens_simulation: { label: 'Simulación de Lentes',  description: 'Acceder a la simulación visual de gamas de lentes progresivos.' },
+  manage_lab_orders:   { label: 'Gestionar Laboratorio', description: 'Crear órdenes de laboratorio/taller y darles seguimiento.' },
+  manage_goals:        { label: 'Gestionar Metas',       description: 'Registrar montos diarios y dar seguimiento a la meta mensual de ventas.' },
 };
 
 export type MemberRole = 'owner' | 'user';
@@ -188,6 +212,69 @@ export interface InviteCode {
   createdAt: string;
   expiresAt: string;
   used: boolean;
+}
+
+// ── Cotizaciones ───────────────────────────────────────────────────────────
+
+export type QuoteItem = InvoiceItem;
+
+export interface Quote {
+  id: string;
+  number: string;
+  customerId: string;
+  customerName: string;
+  date: string;
+  validUntil: string;
+  items: QuoteItem[];
+  subtotal: number;
+  globalDiscount?: number;
+  globalDiscountAmount?: number;
+  tax: number;
+  total: number;
+  status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'converted';
+  notes?: string;
+  currency: string;
+  exchangeRate?: number;
+  createdBy?: string;
+  convertedInvoiceId?: string;
+}
+
+// ── Metas de venta y registro diario ─────────────────────────────────────────
+
+export interface DailyEntry {
+  id: string;
+  date: string; // YYYY-MM-DD
+  type: 'income' | 'expense';
+  amount: number;
+  currency: string;
+  note?: string;
+  createdBy?: string;
+}
+
+// ── Órdenes de laboratorio / taller ──────────────────────────────────────────
+
+export type LabOrderItem = InvoiceItem;
+
+export interface LabOrder {
+  id: string;
+  number: string; // consecutivo propio, ej. LAB-0001
+  date: string;
+  expectedDate?: string; // fecha prometida de entrega
+  customerId: string;
+  customerName: string;
+  quoteId?: string; // origen opcional: cotización
+  quoteNumber?: string;
+  invoiceId?: string; // origen opcional: factura
+  invoiceNumber?: string;
+  items: LabOrderItem[];
+  labProvider: string; // laboratorio externo o "Taller propio"
+  lensType?: string; // ej. Progresivo Premium, Bifocal, Monofocal
+  frameDetail?: string; // armazón: marca/modelo/color
+  measurements?: string; // DIP, altura, etc. (texto libre)
+  status: 'pending' | 'sent' | 'received' | 'delivered' | 'cancelled';
+  notes?: string;
+  currency: string;
+  createdBy?: string;
 }
 
 // ── Tomas de Inventario (auditoría física) ───────────────────────────────────
