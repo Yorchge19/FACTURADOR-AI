@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { Invoice, Expense, Product } from '../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
-import { Calendar, DollarSign, TrendingUp, TrendingDown, Activity, FileBarChart, Download, FileSpreadsheet } from 'lucide-react';
+import { Calendar, DollarSign, TrendingUp, TrendingDown, Activity, FileBarChart, Download, FileSpreadsheet, Sparkles } from 'lucide-react';
 import { useOrganization } from '../contexts/OrganizationContext';
 import { exportReportsToPDF, exportReportsToExcel } from '../services/exportService';
+import { GeminiService } from '../services/geminiService';
 
 interface ReportsProps {
   invoices: Invoice[];
@@ -14,6 +15,8 @@ interface ReportsProps {
 const Reports: React.FC<ReportsProps> = ({ invoices, expenses, products }) => {
   const [dateRange, setDateRange] = useState('month'); // 'month', 'year', 'all'
   const { organization } = useOrganization();
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
+  const [loadingAi, setLoadingAi] = useState(false);
 
   // --- Helper Functions ---
   const filterByDate = (items: any[]) => {
@@ -109,6 +112,23 @@ const Reports: React.FC<ReportsProps> = ({ invoices, expenses, products }) => {
     });
   };
 
+  const handleAiAnalysis = async () => {
+    setLoadingAi(true);
+    const result = await GeminiService.analyzeFinancialReport({
+      dateRangeLabel: dateRange === 'month' ? 'Este Mes' : dateRange === 'year' ? 'Este Año' : 'Todo el Histórico',
+      totalSales,
+      totalExpenses,
+      netProfit,
+      profitMargin,
+      invoiceCount: filteredInvoices.length,
+      expenseCount: filteredExpenses.length,
+      topProducts: productSales,
+      expenseCategories,
+    });
+    setAiAnalysis(result);
+    setLoadingAi(false);
+  };
+
   return (
     <div className="space-y-6 md:space-y-8 animate-fade-in pb-20 md:pb-10">
        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
@@ -123,7 +143,10 @@ const Reports: React.FC<ReportsProps> = ({ invoices, expenses, products }) => {
              <button onClick={() => setDateRange('year')} className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${dateRange === 'year' ? 'bg-gray-100 dark:bg-gray-800 text-black' : 'text-gray-500 dark:text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:text-white'}`}>Este Año</button>
              <button onClick={() => setDateRange('all')} className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${dateRange === 'all' ? 'bg-gray-100 dark:bg-gray-800 text-black' : 'text-gray-500 dark:text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:text-white'}`}>Todo</button>
           </div>
-          <div className="flex gap-2 w-full sm:w-auto">
+          <div className="flex gap-2 w-full sm:w-auto flex-wrap">
+            <button onClick={handleAiAnalysis} disabled={loadingAi} className="flex-1 sm:flex-none bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 px-4 sm:px-5 py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 flex justify-center items-center gap-2 shadow-sm border border-gray-200 dark:border-gray-700 transition-all active:scale-95 disabled:opacity-60 text-xs sm:text-sm font-semibold">
+              <Sparkles size={16} className={loadingAi ? 'animate-spin' : ''} /> {loadingAi ? 'Analizando...' : 'Analizar con IA'}
+            </button>
             <button onClick={handleExportPDF} className="flex-1 sm:flex-none bg-black dark:bg-white text-white dark:text-black px-4 sm:px-5 py-2.5 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 flex justify-center items-center gap-2 shadow-lg shadow-gray-200 transition-all active:scale-95 border border-black dark:border-white text-xs sm:text-sm font-semibold">
               <Download size={16} /> Exportar PDF
             </button>
@@ -133,6 +156,21 @@ const Reports: React.FC<ReportsProps> = ({ invoices, expenses, products }) => {
           </div>
         </div>
        </div>
+
+      {/* ── AI Result ── */}
+      {aiAnalysis && (
+        <div className="relative bg-black dark:bg-gray-900 dark:border dark:border-gray-700 text-white dark:text-gray-100 rounded-2xl p-5 md:p-6 overflow-hidden border border-black">
+          <div className="absolute top-0 right-0 w-48 h-48 rounded-full opacity-10"
+            style={{ background: 'radial-gradient(circle, white 0%, transparent 70%)', transform: 'translate(30%,-30%)' }} />
+          <button onClick={() => setAiAnalysis(null)} className="absolute top-4 right-4 text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors text-xs">✕</button>
+          <h3 className="font-bold flex items-center gap-2 mb-3 text-base md:text-lg">
+            <Sparkles size={18} className="text-gray-300" /> Análisis Inteligente del Reporte
+          </h3>
+          <div className="text-sm text-gray-300 dark:text-gray-400 leading-relaxed space-y-1">
+            {aiAnalysis.split('\n').map((line, i) => <p key={i}>{line}</p>)}
+          </div>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">

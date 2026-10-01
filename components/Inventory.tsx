@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Product } from '../types';
-import { Plus, Edit2, Trash2, Search, Sparkles, X, Package, AlertTriangle, TrendingUp, MoreVertical } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, Sparkles, X, Package, AlertTriangle, TrendingUp, MoreVertical, BarChart3 } from 'lucide-react';
 import { GeminiService } from '../services/geminiService';
 
 interface InventoryProps {
@@ -19,6 +19,15 @@ const Inventory: React.FC<InventoryProps> = ({ products, onAddProduct, onUpdateP
     name: '', sku: '', price: 0, cost: 0, currency: 'CRC', stock: 0, category: '', description: '', type: 'producto', taxRate: 13
   });
   const [generatingDesc, setGeneratingDesc] = useState(false);
+  const [stockAnalysis, setStockAnalysis] = useState<string | null>(null);
+  const [loadingStockAi, setLoadingStockAi] = useState(false);
+
+  const handleStockAnalysis = async () => {
+    setLoadingStockAi(true);
+    const result = await GeminiService.analyzeInventory(products);
+    setStockAnalysis(result);
+    setLoadingStockAi(false);
+  };
 
   const handleOpenModal = (product?: Product) => {
     if (product) {
@@ -83,7 +92,7 @@ const Inventory: React.FC<InventoryProps> = ({ products, onAddProduct, onUpdateP
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 flex flex-col sm:flex-row gap-4">
         <div className="relative flex-grow w-full">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
-          <input 
+          <input
             type="text"
             placeholder="Buscar por nombre, SKU..."
             value={searchTerm}
@@ -91,7 +100,30 @@ const Inventory: React.FC<InventoryProps> = ({ products, onAddProduct, onUpdateP
             className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black focus:border-black dark:border-white outline-none text-sm transition-all"
           />
         </div>
+        <button
+          onClick={handleStockAnalysis}
+          disabled={loadingStockAi || products.length === 0}
+          className="w-full sm:w-auto flex-shrink-0 flex justify-center items-center gap-2 px-4 py-2.5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm hover:border-gray-400 dark:hover:border-gray-600 hover:text-gray-900 dark:hover:text-white transition-all disabled:opacity-60 active:scale-95"
+        >
+          <BarChart3 size={16} className={loadingStockAi ? 'animate-pulse' : ''} />
+          {loadingStockAi ? 'Analizando...' : 'Analizar stock con IA'}
+        </button>
       </div>
+
+      {/* ── AI Stock Analysis ── */}
+      {stockAnalysis && (
+        <div className="relative bg-black dark:bg-gray-900 dark:border dark:border-gray-700 text-white dark:text-gray-100 rounded-2xl p-5 md:p-6 overflow-hidden border border-black">
+          <div className="absolute top-0 right-0 w-48 h-48 rounded-full opacity-10"
+            style={{ background: 'radial-gradient(circle, white 0%, transparent 70%)', transform: 'translate(30%,-30%)' }} />
+          <button onClick={() => setStockAnalysis(null)} className="absolute top-4 right-4 text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors text-xs">✕</button>
+          <h3 className="font-bold flex items-center gap-2 mb-3 text-base md:text-lg">
+            <Sparkles size={18} className="text-gray-300" /> Análisis Inteligente del Inventario
+          </h3>
+          <div className="text-sm text-gray-300 dark:text-gray-400 leading-relaxed space-y-1">
+            {stockAnalysis.split('\n').map((line, i) => <p key={i}>{line}</p>)}
+          </div>
+        </div>
+      )}
 
       {/* Mobile Card View */}
       <div className="md:hidden space-y-4">

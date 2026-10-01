@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { DailyEntry, AppSettings } from '../types';
-import { Plus, Trash2, Target, TrendingUp, TrendingDown, Calendar, DollarSign, Flag, PiggyBank } from 'lucide-react';
+import { Plus, Trash2, Target, TrendingUp, TrendingDown, Calendar, DollarSign, Flag, PiggyBank, Sparkles } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { GeminiService } from '../services/geminiService';
 
 interface GoalsProps {
   entries: DailyEntry[];
@@ -24,6 +25,8 @@ const Goals: React.FC<GoalsProps> = ({ entries, settings, onSaveEntry, onDeleteE
   const [viewMonth, setViewMonth] = useState(currentMonthStr());
   const [isEditingGoal, setIsEditingGoal] = useState(false);
   const [goalInput, setGoalInput] = useState('');
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
+  const [loadingAi, setLoadingAi] = useState(false);
 
   const [formData, setFormData] = useState<Partial<DailyEntry>>({
     date: new Date().toISOString().split('T')[0],
@@ -108,6 +111,25 @@ const Goals: React.FC<GoalsProps> = ({ entries, settings, onSaveEntry, onDeleteE
     setIsEditingGoal(true);
   };
 
+  const monthLabel = new Date(viewMonth + '-01T00:00:00').toLocaleDateString('es-CR', { month: 'long', year: 'numeric' });
+
+  const handleAiAnalysis = async () => {
+    setLoadingAi(true);
+    const result = await GeminiService.analyzeGoalProgress({
+      monthLabel,
+      target,
+      accumulated: income,
+      progress,
+      remaining,
+      remainingDays,
+      neededPerDay,
+      avgPerDay,
+      monthExpenses,
+    });
+    setAiAnalysis(result);
+    setLoadingAi(false);
+  };
+
   return (
     <div className="space-y-6 md:space-y-8 animate-fade-in pb-20 md:pb-10">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -120,13 +142,39 @@ const Goals: React.FC<GoalsProps> = ({ entries, settings, onSaveEntry, onDeleteE
           </h2>
           <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm md:text-base">Registre los montos diarios y siga el avance de la meta mensual</p>
         </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="w-full md:w-auto bg-black dark:bg-white text-white dark:text-black px-5 py-3 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 flex justify-center items-center gap-2 shadow-lg shadow-gray-200 transition-all active:scale-95 border border-black dark:border-white"
-        >
-          <Plus size={20} /> Registrar Monto
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+          <button
+            onClick={handleAiAnalysis}
+            disabled={loadingAi || target <= 0}
+            title={target <= 0 ? 'Establezca primero una meta mensual' : 'Analizar avance con IA'}
+            className="w-full sm:w-auto flex justify-center items-center gap-2 px-5 py-3 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm hover:border-gray-400 dark:hover:border-gray-600 hover:text-gray-900 dark:hover:text-white transition-all disabled:opacity-60 active:scale-95"
+          >
+            <Sparkles size={18} className={loadingAi ? 'animate-spin' : ''} />
+            {loadingAi ? 'Analizando...' : 'Analizar con IA'}
+          </button>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="w-full sm:w-auto bg-black dark:bg-white text-white dark:text-black px-5 py-3 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 flex justify-center items-center gap-2 shadow-lg shadow-gray-200 transition-all active:scale-95 border border-black dark:border-white"
+          >
+            <Plus size={20} /> Registrar Monto
+          </button>
+        </div>
       </div>
+
+      {/* ── AI Result ── */}
+      {aiAnalysis && (
+        <div className="relative bg-black dark:bg-gray-900 dark:border dark:border-gray-700 text-white dark:text-gray-100 rounded-2xl p-5 md:p-6 overflow-hidden border border-black">
+          <div className="absolute top-0 right-0 w-48 h-48 rounded-full opacity-10"
+            style={{ background: 'radial-gradient(circle, white 0%, transparent 70%)', transform: 'translate(30%,-30%)' }} />
+          <button onClick={() => setAiAnalysis(null)} className="absolute top-4 right-4 text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors text-xs">✕</button>
+          <h3 className="font-bold flex items-center gap-2 mb-3 text-base md:text-lg">
+            <Sparkles size={18} className="text-gray-300" /> Análisis Inteligente de la Meta ({monthLabel})
+          </h3>
+          <div className="text-sm text-gray-300 dark:text-gray-400 leading-relaxed space-y-1">
+            {aiAnalysis.split('\n').map((line, i) => <p key={i}>{line}</p>)}
+          </div>
+        </div>
+      )}
 
       {/* Month selector */}
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
