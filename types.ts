@@ -4,6 +4,7 @@ export interface Product {
   name: string;
   description: string;
   sku: string;
+  barcode?: string; // número de código de barras (EAN-13, UPC, Code128, etc.)
   price: number;
   cost?: number;
   currency: string;

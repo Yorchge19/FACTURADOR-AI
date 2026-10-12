@@ -82,6 +82,23 @@ const ls = {
 const snapshotToData = <T>(snapshot: any): T[] =>
   snapshot.docs.map((d: any) => ({ ...d.data(), id: d.id })) as T[];
 
+// ── Sanitizer ───────────────────────────────────────────────────────────────
+// Firestore rechaza campos con valor `undefined` (lanza "Unsupported field
+// value: undefined" y el guardado falla en silencio desde la UI). Limpiamos
+// recursivamente antes de cada escritura.
+const stripUndefined = <T>(obj: T): T => {
+  if (Array.isArray(obj)) return obj.map((v) => stripUndefined(v)) as unknown as T;
+  if (obj !== null && typeof obj === 'object') {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(obj as Record<string, unknown>)) {
+      if (v === undefined) continue;
+      out[k] = stripUndefined(v);
+    }
+    return out as T;
+  }
+  return obj;
+};
+
 // ── Storage Service ───────────────────────────────────────────────────────────
 
 export const StorageService = {
@@ -94,8 +111,50 @@ export const StorageService = {
   },
 
   addProduct: async (product: Product, orgId?: string) => {
-    if (!db || !orgId) return ls.add(COLLECTIONS.PRODUCTS, product);
-    await setDoc(orgDoc(orgId, COLLECTIONS.PRODUCTS, product.id), product);
+    if (!db || !orgId) return ls.add(COLLECTIONS.PRODUCTS, stripUndefined(product));
+    await setDoc(orgDoc(orgId, COLLECTIONS.PRODUCTS, product.id), stripUndefined(product));
+  },
+
+  /** Alta masiva: inserta/actualiza N productos en un solo batch (importación Excel) */
+  bulkUpsertProducts: async (productsList: Product[], orgId?: string) => {
+    const clean = productsList.map((p) => stripUndefined(p));
+    if (!db || !orgId) {
+      const existing = ls.get<Product>(COLLECTIONS.PRODUCTS);
+      const byId = new Map(existing.map((p) => [p.id, p]));
+      const bySku = new Map(existing.map((p) => [String(p.sku || '').toLowerCase(), p]));
+      for (const p of clean) {
+        const prevById = byId.get(p.id);
+        const prevBySku = bySku.get(String(p.sku || '').toLowerCase());
+        const prev = prevById ?? prevBySku;
+        if (prev) {
+          const merged = { ...prev, ...p, id: prev.id };
+          byId.set(prev.id, merged);
+          bySku.set(String(merged.sku || '').toLowerCase(), merged);
+        } else {
+          byId.set(p.id, p);
+          bySku.set(String(p.sku || '').toLowerCase(), p);
+        }
+      }
+      ls.set(COLLECTIONS.PRODUCTS, [...byId.values()]);
+      return;
+    }
+    // Por SKU: si ya existe un producto con el mismo SKU, se actualiza en lugar de duplicar
+    const snap = await getDocs(orgCol(orgId, COLLECTIONS.PRODUCTS));
+    const existingBySku = new Map<string, string>();
+    snap.docs.forEach((d: any) => {
+      const data = d.data() as Product;
+      if (data.sku) existingBySku.set(String(data.sku).toLowerCase(), d.id);
+    });
+    const firestore = db!;
+    // Firestore limita el batch a 500 operaciones: partimos en bloques
+    for (let i = 0; i < clean.length; i += 450) {
+      const batch = writeBatch(firestore);
+      for (const p of clean.slice(i, i + 450)) {
+        const targetId = existingBySku.get(String(p.sku || '').toLowerCase()) ?? p.id;
+        batch.set(doc(firestore, 'organizations', orgId, COLLECTIONS.PRODUCTS, targetId), { ...p, id: targetId }, { merge: true });
+      }
+      await batch.commit();
+    }
   },
 
   updateProduct: async (product: Product, orgId?: string) => {
@@ -276,8 +335,8 @@ export const StorageService = {
   },
 
   saveDailyEntry: async (entry: DailyEntry, orgId?: string) => {
-    if (!db || !orgId) return ls.add(COLLECTIONS.DAILY_ENTRIES, entry);
-    await setDoc(orgDoc(orgId, COLLECTIONS.DAILY_ENTRIES, entry.id), entry);
+    if (!db || !orgId) return ls.add(COLLECTIONS.DAILY_ENTRIES, stripUndefined(entry));
+    await setDoc(orgDoc(orgId, COLLECTIONS.DAILY_ENTRIES, entry.id), stripUndefined(entry));
   },
 
   deleteDailyEntry: async (id: string, orgId?: string) => {
@@ -303,11 +362,12 @@ export const StorageService = {
   },
 
   saveSettings: async (settings: AppSettings, orgId?: string) => {
+    const clean = stripUndefined(settings);
     if (!db || !orgId) {
-      localStorage.setItem(`${LS_PREFIX}${COLLECTIONS.SETTINGS}`, JSON.stringify(settings));
+      localStorage.setItem(`${LS_PREFIX}${COLLECTIONS.SETTINGS}`, JSON.stringify(clean));
       return;
     }
-    await setDoc(doc(db!, 'organizations', orgId, COLLECTIONS.SETTINGS, 'general'), settings);
+    await setDoc(doc(db!, 'organizations', orgId, COLLECTIONS.SETTINGS, 'general'), clean, { merge: true });
   },
 
   // Inventory Audits

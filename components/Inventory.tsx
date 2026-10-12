@@ -1,19 +1,113 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Product } from '../types';
-import { Plus, Edit2, Trash2, Search, Sparkles, X, Package, AlertTriangle, TrendingUp, MoreVertical, BarChart3 } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, Sparkles, X, Package, AlertTriangle, TrendingUp, Upload, Download, FileSpreadsheet, BarChart3 } from 'lucide-react';
 import { GeminiService } from '../services/geminiService';
+import * as XLSX from 'xlsx';
 
 interface InventoryProps {
   products: Product[];
   onAddProduct: (p: Product) => void;
   onUpdateProduct: (p: Product) => void;
   onDeleteProduct: (id: string) => void;
+  onBulkImport?: (list: Product[]) => void | Promise<void>;
 }
 
-const Inventory: React.FC<InventoryProps> = ({ products, onAddProduct, onUpdateProduct, onDeleteProduct }) => {
+// ── Helpers de importación Excel ──────────────────────────────────────────
+// Columnas esperadas (insensible a mayúsculas/acentos): Código | Descripción |
+// Existencia | Precio Venta IVI | NUMERO DE CODIGO DE BARRAS | CODIGO DE BARRAS
+const normHeader = (v: unknown) =>
+  String(v ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+
+const parseNum = (v: unknown): number => {
+  if (typeof v === 'number') return isNaN(v) ? 0 : v;
+  const s = String(v ?? '').replace(/[^0-9,.\-]/g, '').replace(/,/g, '');
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+};
+
+const onlyDigits = (v: unknown) => String(v ?? '').replace(/\D/g, '');
+
+function parseInventorySheet(rows: unknown[][]): { items: Product[]; errors: string[] } {
+  const items: Product[] = [];
+  const errors: string[] = [];
+  if (!rows || rows.length === 0) return { items, errors: ['El archivo no contiene filas.'] };
+  // Localizar fila de encabezados (la primera que mencione codigo o descripcion)
+  let headerIdx = -1;
+  for (let i = 0; i < Math.min(rows.length, 10); i++) {
+    const cells = (rows[i] as unknown[]).map(normHeader);
+    if (cells.some((c) => c.includes('codigo') || c.includes('descripcion') || c.includes('existencia'))) {
+      headerIdx = i;
+      break;
+    }
+  }
+  if (headerIdx < 0) return { items, errors: ['No se encontró la fila de encabezados (Código, Descripción, Existencia, Precio Venta IVI, ...).'] };
+  const headers = (rows[headerIdx] as unknown[]).map(normHeader);
+  const col = { code: -1, desc: -1, stock: -1, price: -1, barcodeNum: -1, barcode: -1 };
+  headers.forEach((h, i) => {
+    if (h.includes('numero') && h.includes('barra')) col.barcodeNum = i;
+    else if (h.includes('barra')) col.barcode = i;
+    else if (h === 'codigo' || (h.includes('codigo') && !h.includes('barra'))) col.code = i;
+    else if (h.includes('descripcion')) col.desc = i;
+    else if (h.includes('existencia') || h === 'stock' || h.includes('cantidad')) col.stock = i;
+    else if (h.includes('precio')) col.price = i;
+  });
+  if (col.desc < 0 && col.code < 0) return { items, errors: ['Faltan las columnas Código y/o Descripción.'] };
+  const cell = (r: unknown[], i: number) => (i >= 0 ? r[i] : undefined);
+  for (let r = headerIdx + 1; r < rows.length; r++) {
+    const row = rows[r] as unknown[];
+    if (!row || row.every((c) => c === null || c === undefined || String(c).trim() === '')) continue;
+    const code = String(cell(row, col.code) ?? '').trim();
+    const desc = String(cell(row, col.desc) ?? '').trim();
+    const barcodeNum = onlyDigits(cell(row, col.barcodeNum));
+    const barcodeAlt = onlyDigits(cell(row, col.barcode));
+    const barcode = barcodeNum || barcodeAlt || undefined;
+    const sku = code || barcode || '';
+    const name = desc || code || barcode || '';
+    if (!sku && !name) { errors.push(`Fila ${r + 1}: sin Código ni Descripción, se omitió.`); continue; }
+    const stock = Math.max(0, Math.floor(parseNum(cell(row, col.stock))));
+    const gross = parseNum(cell(row, col.price));
+    // El Excel trae Precio Venta IVI (con IVA 13%): se guarda neto para no duplicar el impuesto en factura
+    const net = gross > 0 ? Math.round((gross / 1.13) * 100) / 100 : 0;
+    items.push({
+      id: crypto.randomUUID(),
+      name,
+      description: desc || name,
+      sku: sku || `IMP-${r}`,
+      ...(barcode ? { barcode } : {}),
+      price: net,
+      cost: 0,
+      currency: 'CRC',
+      stock,
+      category: 'General',
+      type: 'producto',
+      taxRate: 13,
+    });
+  }
+  if (items.length === 0 && errors.length === 0) errors.push('No se encontraron filas con datos.');
+  return { items, errors };
+}
+
+function downloadInventoryTemplate() {
+  const data = [
+    ['Código', 'Descripción', 'Existencia', 'Precio Venta IVI', 'NUMERO DE CODIGO DE BARRAS', 'CODIGO DE BARRAS'],
+    ['BIFLEX 110554', 'BIFLEX 110554', 1, 70000, '', ''],
+    ['DAKAR DA 11036 633', 'DAKAR DA 11036 633', 1, 50000, '7441103606331', ''],
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  ws['!cols'] = [{ wch: 22 }, { wch: 26 }, { wch: 12 }, { wch: 18 }, { wch: 28 }, { wch: 20 }];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
+  XLSX.writeFile(wb, 'plantilla_inventario.xlsx');
+}
+
+const Inventory: React.FC<InventoryProps> = ({ products, onAddProduct, onUpdateProduct, onDeleteProduct, onBulkImport }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [importPreview, setImportPreview] = useState<Product[] | null>(null);
+  const [importErrors, setImportErrors] = useState<string[]>([]);
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState<Partial<Product>>({
     name: '', sku: '', price: 0, cost: 0, currency: 'CRC', stock: 0, category: '', description: '', type: 'producto', taxRate: 13
@@ -63,10 +157,50 @@ const Inventory: React.FC<InventoryProps> = ({ products, onAddProduct, onUpdateP
     setIsModalOpen(false);
   };
 
-  const filteredProducts = products.filter(p => 
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    p.sku.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProducts = products.filter(p => {
+    const term = searchTerm.toLowerCase();
+    return p.name.toLowerCase().includes(term) ||
+      p.sku.toLowerCase().includes(term) ||
+      (p.barcode || '').toLowerCase().includes(term);
+  });
+
+  const handleExcelFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, defval: '' }) as unknown[][];
+      const { items, errors } = parseInventorySheet(rows);
+      setImportErrors(errors);
+      if (items.length === 0) {
+        alert(errors[0] || 'No se encontraron productos en el archivo.');
+        return;
+      }
+      setImportPreview(items);
+    } catch (err) {
+      console.error('Error al leer el Excel', err);
+      alert('No se pudo leer el archivo. Use .xlsx, .xls o .csv con las columnas: Código, Descripción, Existencia, Precio Venta IVI, NUMERO DE CODIGO DE BARRAS.');
+    }
+  };
+
+  const handleConfirmImport = async () => {
+    if (!importPreview || importPreview.length === 0) return;
+    setImporting(true);
+    try {
+      await onBulkImport?.(importPreview);
+      alert(`Se importaron ${importPreview.length} productos al inventario.`);
+      setImportPreview(null);
+      setImportErrors([]);
+    } catch (err) {
+      console.error('Error al importar inventario', err);
+      alert('No se pudo guardar la importación. Intente de nuevo.');
+    } finally {
+      setImporting(false);
+    }
+  };
 
   const calculateMargin = (price: number, cost: number = 0) => {
     if (price === 0) return 0;
@@ -80,13 +214,36 @@ const Inventory: React.FC<InventoryProps> = ({ products, onAddProduct, onUpdateP
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Inventario</h2>
           <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm md:text-base">Gestiona tus productos, costos y existencias</p>
         </div>
-        <button 
-          onClick={() => handleOpenModal()}
-          className="w-full md:w-auto bg-black dark:bg-white text-white dark:text-black px-5 py-3 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 flex justify-center items-center gap-2 shadow-lg shadow-gray-200 transition-all active:scale-95 border border-black dark:border-white"
-        >
-          <Plus size={20} /> Nuevo Producto
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+          <button
+            onClick={downloadInventoryTemplate}
+            title="Descargar plantilla Excel con las columnas: Código, Descripción, Existencia, Precio Venta IVI, NUMERO DE CODIGO DE BARRAS"
+            className="w-full md:w-auto bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 px-5 py-3 rounded-xl hover:bg-gray-50 dark:bg-gray-800 flex justify-center items-center gap-2 border border-gray-200 dark:border-gray-700 font-semibold text-sm transition-all active:scale-95"
+          >
+            <Download size={18} /> Plantilla Excel
+          </button>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            title="Subir un Excel con todo el inventario para registrarlo de una vez"
+            className="w-full md:w-auto bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 px-5 py-3 rounded-xl hover:bg-gray-50 dark:bg-gray-800 flex justify-center items-center gap-2 border border-gray-200 dark:border-gray-700 font-semibold text-sm transition-all active:scale-95"
+          >
+            <Upload size={18} /> Importar Excel
+          </button>
+          <button
+            onClick={() => handleOpenModal()}
+            className="w-full md:w-auto bg-black dark:bg-white text-white dark:text-black px-5 py-3 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 flex justify-center items-center gap-2 shadow-lg shadow-gray-200 transition-all active:scale-95 border border-black dark:border-white"
+          >
+            <Plus size={20} /> Nuevo Producto
+          </button>
+        </div>
       </div>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".xlsx,.xls,.csv"
+        className="hidden"
+        onChange={handleExcelFile}
+      />
 
       {/* Toolbar */}
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 flex flex-col sm:flex-row gap-4">
@@ -94,7 +251,7 @@ const Inventory: React.FC<InventoryProps> = ({ products, onAddProduct, onUpdateP
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
           <input
             type="text"
-            placeholder="Buscar por nombre, SKU..."
+            placeholder="Buscar por nombre, SKU o código de barras..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black focus:border-black dark:border-white outline-none text-sm transition-all"
@@ -139,9 +296,12 @@ const Inventory: React.FC<InventoryProps> = ({ products, onAddProduct, onUpdateP
               <div key={product.id} className="bg-white dark:bg-gray-900 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 relative overflow-hidden">
                  <div className="flex justify-between items-start mb-2">
                     <div>
-                       <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-black border border-gray-200 dark:border-gray-700 rounded text-[10px] font-bold uppercase tracking-wide mb-1">
-                          {product.sku}
-                       </span>
+                        <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-black border border-gray-200 dark:border-gray-700 rounded text-[10px] font-bold uppercase tracking-wide mb-1">
+                           {product.sku}
+                        </span>
+                        {product.barcode && (
+                          <span className="block font-mono text-[11px] text-gray-500 dark:text-gray-400 mb-1">▮ {product.barcode}</span>
+                        )}
                        <h3 className="font-bold text-gray-900 dark:text-white text-lg leading-tight">{product.name}</h3>
                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate max-w-[200px]">{product.category}</p>
                     </div>
@@ -221,6 +381,9 @@ const Inventory: React.FC<InventoryProps> = ({ products, onAddProduct, onUpdateP
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-gray-700 dark:text-gray-300 font-mono text-xs">{product.sku}</div>
+                        {product.barcode && (
+                          <div className="text-gray-400 dark:text-gray-500 font-mono text-[11px] mt-0.5">▮ {product.barcode}</div>
+                        )}
                         <span className="inline-block mt-1 px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded text-[10px] font-medium uppercase tracking-wide border border-gray-200 dark:border-gray-700">
                           {product.category}
                         </span>
@@ -245,7 +408,7 @@ const Inventory: React.FC<InventoryProps> = ({ products, onAddProduct, onUpdateP
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <div className="flex justify-center gap-2 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+                        <div className="flex justify-center gap-2">
                           <button onClick={() => handleOpenModal(product)} className="p-2 hover:bg-gray-200 rounded-lg text-gray-800 dark:text-gray-200 transition-colors" title="Editar">
                             <Edit2 size={16} />
                           </button>
@@ -284,6 +447,10 @@ const Inventory: React.FC<InventoryProps> = ({ products, onAddProduct, onUpdateP
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">SKU (Código)</label>
                   <input required type="text" value={formData.sku} onChange={e => setFormData({...formData, sku: e.target.value})} className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white dark:border-white outline-none transition-all dark:bg-gray-800 dark:text-white dark:placeholder-gray-400" placeholder="Ej. LP-001" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Nº Código de Barras</label>
+                  <input type="text" inputMode="numeric" value={formData.barcode || ''} onChange={e => setFormData({...formData, barcode: e.target.value.replace(/\D/g, '')})} className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white dark:border-white outline-none transition-all dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 font-mono" placeholder="Ej. 7441103606331" />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Categoría</label>
@@ -380,6 +547,66 @@ const Inventory: React.FC<InventoryProps> = ({ products, onAddProduct, onUpdateP
                 <button type="submit" className="px-5 py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 font-medium shadow-lg shadow-gray-300 transition-all w-full md:w-auto">Guardar</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Import preview modal */}
+      {importPreview && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end md:items-center justify-center z-[60] p-0 md:p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-t-2xl md:rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden max-h-[90vh] flex flex-col">
+            <div className="flex justify-between items-center p-4 md:p-6 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
+              <div>
+                <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <FileSpreadsheet size={20} /> Vista previa de importación
+                </h3>
+                <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                  {importPreview.length} producto(s) listos para registrar · El Precio Venta IVI se convierte a neto (÷1.13) · Si el SKU ya existe, se actualiza en lugar de duplicarse
+                </p>
+              </div>
+              <button onClick={() => { setImportPreview(null); setImportErrors([]); }} className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"><X size={20} /></button>
+            </div>
+            {importErrors.length > 0 && (
+              <div className="mx-4 md:mx-6 mt-4 bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800 max-h-24 overflow-auto">
+                {importErrors.slice(0, 10).map((e, i) => <p key={i}>• {e}</p>)}
+                {importErrors.length > 10 && <p>• …y {importErrors.length - 10} aviso(s) más</p>}
+              </div>
+            )}
+            <div className="p-4 md:p-6 overflow-y-auto flex-1">
+              <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-xl">
+                <table className="w-full text-left text-xs md:text-sm">
+                  <thead className="bg-gray-50 dark:bg-gray-800 text-gray-500 uppercase font-semibold">
+                    <tr>
+                      <th className="px-3 py-2">Código</th>
+                      <th className="px-3 py-2">Descripción</th>
+                      <th className="px-3 py-2 text-center">Exist.</th>
+                      <th className="px-3 py-2 text-right">Precio neto</th>
+                      <th className="px-3 py-2">Cód. barras</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                    {importPreview.slice(0, 200).map((p) => (
+                      <tr key={p.id}>
+                        <td className="px-3 py-2 font-mono">{p.sku}</td>
+                        <td className="px-3 py-2">{p.name}</td>
+                        <td className="px-3 py-2 text-center">{p.stock}</td>
+                        <td className="px-3 py-2 text-right font-semibold">₡ {p.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                        <td className="px-3 py-2 font-mono">{p.barcode || '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {importPreview.length > 200 && (
+                  <p className="text-xs text-gray-400 p-3 text-center">Mostrando 200 de {importPreview.length} filas…</p>
+                )}
+              </div>
+            </div>
+            <div className="p-4 md:p-6 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row justify-end gap-3 flex-shrink-0">
+              <button onClick={() => { setImportPreview(null); setImportErrors([]); }} className="px-5 py-3 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl font-medium w-full sm:w-auto">Cancelar</button>
+              <button onClick={handleConfirmImport} disabled={importing} className="px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl hover:bg-gray-800 font-semibold disabled:opacity-60 w-full sm:w-auto border border-black">
+                {importing ? 'Registrando…' : `Confirmar y registrar ${importPreview.length} productos`}
+              </button>
+            </div>
           </div>
         </div>
       )}

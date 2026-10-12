@@ -2,7 +2,8 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Product, InventoryCountItem, InventoryAudit } from '../types';
 import {
   ClipboardList, Search, Plus, Minus, Trash2, X,
-  Package, CheckCircle, AlertTriangle, TrendingUp, History, Save, RotateCcw, ClipboardCheck
+  Package, CheckCircle, AlertTriangle, TrendingUp, History, Save, RotateCcw, ClipboardCheck,
+  ScanLine, CloudUpload
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -10,13 +11,28 @@ interface InventoryCountProps {
   products: Product[];
   audits: InventoryAudit[];
   onSaveAudit: (audit: InventoryAudit) => void;
+  /** Clave para aislar el borrador autoguardado por organización */
+  draftKey?: string;
 }
 
-const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSaveAudit }) => {
+const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSaveAudit, draftKey }) => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [countedItems, setCountedItems] = useState<InventoryCountItem[]>([]);
+  const [draftNotice, setDraftNotice] = useState<{ updatedAt: string; count: number } | null>(null);
+  const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
+  // Escáner de códigos de barras (solo celulares)
+  const [scanOpen, setScanOpen] = useState(false);
+  const [scanError, setScanError] = useState<string | null>(null);
+  const [scanning, setScanning] = useState(false);
+  const [lastCode, setLastCode] = useState<string | null>(null);
+  const [scanCount, setScanCount] = useState(0);
+  const [scanMiss, setScanMiss] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const scanTimerRef = useRef<number | null>(null);
+  const lastDetectRef = useRef<{ code: string; at: number }>({ code: '', at: 0 });
   const [auditPreview, setAuditPreview] = useState<{
     matched: InventoryCountItem[];
     missing: (InventoryCountItem & { diff: number })[];
@@ -25,6 +41,53 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
   const [showHistory, setShowHistory] = useState(false);
   const [expandedAuditId, setExpandedAuditId] = useState<string | null>(null);
   const searchRef = useRef<HTMLDivElement>(null);
+
+  const draftStorageKey = `fai_count_draft_${draftKey ?? 'local'}`;
+  // Botón de escáner exclusivo para celular: se muestra si hay cámara Y
+  // (pantalla táctil o pantalla angosta). No se usa ni el userAgent (viene
+  // reducido en celulares modernos) ni solo el ancho (la "vista de escritorio"
+  // del Chrome móvil reporta ancho de PC y ocultaba el botón).
+  const [showScanner, setShowScanner] = useState(false);
+  useEffect(() => {
+    const compute = () => {
+      const hasCamera = typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getUserMedia;
+      if (!hasCamera || typeof window === 'undefined') { setShowScanner(false); return; }
+      const coarse = !!window.matchMedia?.('(pointer: coarse)').matches;
+      const narrow = window.innerWidth < 1024;
+      setShowScanner(coarse || narrow);
+    };
+    compute();
+    window.addEventListener('resize', compute);
+    return () => window.removeEventListener('resize', compute);
+  }, []);
+
+  // ── Borrador autoguardado: restaurar al abrir ──
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(draftStorageKey);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as { items: InventoryCountItem[]; updatedAt: string };
+      if (parsed?.items && parsed.items.length > 0) {
+        setCountedItems(parsed.items);
+        setDraftNotice({ updatedAt: parsed.updatedAt, count: parsed.items.length });
+      }
+    } catch { /* borrador corrupto: se ignora */ }
+    // solo al montar
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draftStorageKey]);
+
+  // ── Borrador autoguardado: guardar cada cambio (protege ante caída de internet o cierre) ──
+  useEffect(() => {
+    try {
+      if (countedItems.length === 0) {
+        localStorage.removeItem(draftStorageKey);
+        setLastSavedAt(null);
+        return;
+      }
+      localStorage.setItem(draftStorageKey, JSON.stringify({ items: countedItems, updatedAt: new Date().toISOString() }));
+      setLastSavedAt(new Date().toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    } catch { /* almacenamiento lleno o bloqueado: se ignora */ }
+  }, [countedItems, draftStorageKey]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -37,12 +100,20 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  // Detener cámara al cerrar el escáner / desmontar
+  useEffect(() => {
+    return () => { stopScanner(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const filteredSuggestions = useMemo(() => {
     if (!searchTerm.trim()) return [];
     const term = searchTerm.toLowerCase();
+    const digits = searchTerm.replace(/\D/g, '');
     return products.filter(p =>
       p.sku.toLowerCase().includes(term) ||
-      p.name.toLowerCase().includes(term)
+      p.name.toLowerCase().includes(term) ||
+      (p.barcode && (p.barcode.toLowerCase().includes(term) || (digits && p.barcode.includes(digits))))
     ).slice(0, 8);
   }, [searchTerm, products]);
 
@@ -66,9 +137,20 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
     setIsDropdownOpen(false);
   };
 
+  const findProductByCode = (code: string): Product | undefined => {
+    const term = code.trim().toLowerCase();
+    if (!term) return undefined;
+    const digits = code.replace(/\D/g, '');
+    return products.find(p =>
+      p.sku.toLowerCase() === term ||
+      (p.barcode && (p.barcode.toLowerCase() === term || (digits && p.barcode === digits))) ||
+      (digits && p.sku.replace(/\D/g, '') === digits)
+    );
+  };
+
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      const exact = products.find(p => p.sku.toLowerCase() === searchTerm.trim().toLowerCase());
+      const exact = findProductByCode(searchTerm);
       if (exact) {
         e.preventDefault();
         handleAddProduct(exact);
@@ -79,6 +161,92 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
         handleAddProduct(filteredSuggestions[0]);
       }
     }
+  };
+
+  // ── Escáner de códigos de barras (cámara del celular) ──
+  const stopScanner = () => {
+    if (scanTimerRef.current !== null) {
+      window.clearInterval(scanTimerRef.current);
+      scanTimerRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) videoRef.current.srcObject = null;
+    setScanning(false);
+  };
+
+  const handleScannedCode = (code: string) => {
+    const now = Date.now();
+    // Anti-rebote: ignorar el mismo código dentro de 1.5s (la cámara lo ve en varios frames)
+    if (lastDetectRef.current.code === code && now - lastDetectRef.current.at < 1500) return;
+    lastDetectRef.current = { code, at: now };
+    const product = findProductByCode(code);
+    if (product) {
+      handleAddProduct(product);
+      setLastCode(`${product.sku} · ${product.name}`);
+      setScanMiss(null);
+      setScanCount((c) => c + 1);
+      try { (navigator as any)?.vibrate?.(80); } catch { /* no soportado */ }
+    } else {
+      setScanMiss(code);
+    }
+  };
+
+  const startScanner = async () => {
+    setScanError(null);
+    setScanMiss(null);
+    const Detector = (window as any).BarcodeDetector;
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setScanError('Este dispositivo no permite acceder a la cámara. Escriba el código manualmente.');
+      return;
+    }
+    if (!Detector) {
+      setScanError('Este celular/navegador no soporta escaneo directo (se requiere Chrome en Android). Escriba el código o SKU manualmente.');
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } },
+        audio: false,
+      });
+      streamRef.current = stream;
+      const video = videoRef.current;
+      if (!video) return;
+      video.srcObject = stream;
+      await video.play();
+      const detector = new Detector({
+        formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'itf', 'qr_code'],
+      });
+      setScanning(true);
+      scanTimerRef.current = window.setInterval(async () => {
+        try {
+          if (video.readyState < 2) return;
+          const results = await detector.detect(video);
+          if (results && results.length > 0 && results[0]?.rawValue) {
+            handleScannedCode(String(results[0].rawValue));
+          }
+        } catch { /* frame no legible: se sigue intentando */ }
+      }, 350);
+    } catch {
+      setScanError('No se pudo abrir la cámara. Verifique el permiso de cámara del navegador e intente de nuevo.');
+    }
+  };
+
+  const handleOpenScanner = () => {
+    setScanOpen(true);
+    setScanError(null);
+    setLastCode(null);
+    setScanMiss(null);
+    setScanCount(0);
+    // La cámara se enciende en el siguiente tick, cuando el <video> ya existe
+    setTimeout(() => { startScanner(); }, 50);
+  };
+
+  const handleCloseScanner = () => {
+    stopScanner();
+    setScanOpen(false);
   };
 
   const handleQtyChange = (productId: string, newQty: number) => {
@@ -139,24 +307,35 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
 
   const handleSaveAudit = () => {
     if (!auditPreview) return;
-    const audit: InventoryAudit = {
+    const cleanAudit: InventoryAudit = {
       id: crypto.randomUUID(),
       date: new Date().toISOString(),
-      userId: (user as any)?.uid,
-      userName: (user as any)?.email || (user as any)?.displayName || undefined,
+      ...(user && (user as any)?.uid ? { userId: (user as any).uid } : {}),
+      ...(((user as any)?.email || (user as any)?.displayName) ? { userName: (user as any)?.email || (user as any)?.displayName } : {}),
       items: [...countedItems],
       matched: auditPreview.matched,
       missing: auditPreview.missing,
       extra: auditPreview.extra,
     };
-    onSaveAudit(audit);
+    onSaveAudit(cleanAudit);
     setAuditPreview(null);
+    // Conteo guardado: limpiar borrador autoguardado
+    try { localStorage.removeItem(draftStorageKey); } catch { /* ignorar */ }
+    setDraftNotice(null);
     // keep countedItems so user can see? spec says poder iniciar nuevo conteo -> we keep until explicit reset
   };
 
   const handleNewCount = () => {
     setCountedItems([]);
     setAuditPreview(null);
+    try { localStorage.removeItem(draftStorageKey); } catch { /* ignorar */ }
+    setDraftNotice(null);
+  };
+
+  const handleDiscardDraft = () => {
+    setCountedItems([]);
+    setDraftNotice(null);
+    try { localStorage.removeItem(draftStorageKey); } catch { /* ignorar */ }
   };
 
   const totalCountedUnits = countedItems.reduce((acc, i) => acc + i.countedQty, 0);
@@ -300,11 +479,12 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
 
       {/* Search Bar */}
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-        <div className="relative" ref={searchRef}>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="relative flex-1" ref={searchRef}>
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
           <input
             type="text"
-            placeholder="Buscar por SKU o nombre del producto... (Enter para agregar si hay coincidencia exacta)"
+            placeholder="Buscar por SKU, código de barras o nombre... (Enter para agregar)"
             value={searchTerm}
             onChange={(e) => { setSearchTerm(e.target.value); setIsDropdownOpen(true); }}
             onFocus={() => setIsDropdownOpen(true)}
@@ -321,7 +501,7 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
                 >
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{p.name}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">{p.sku} · Stock sistema: {p.stock}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">{p.sku}{p.barcode ? ` · ▮ ${p.barcode}` : ''} · Stock: {p.stock}</p>
                   </div>
                   <span className="flex-shrink-0 h-7 w-7 rounded-lg bg-black dark:bg-white text-white dark:text-black flex items-center justify-center">
                     <Plus size={14} />
@@ -330,9 +510,43 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
               ))}
             </div>
           )}
+          </div>
+          {showScanner && (
+            <button
+              onClick={handleOpenScanner}
+              className="flex-shrink-0 px-4 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-95 border border-black"
+            >
+              <ScanLine size={18} /> Escanear
+            </button>
+          )}
         </div>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">Tip: puedes escanear el mismo código varias veces para incrementar la cantidad.</p>
+        <div className="flex flex-wrap items-center gap-2 mt-2">
+          <p className="text-xs text-gray-400 dark:text-gray-500">Tip: puedes agregar el mismo código varias veces para incrementar la cantidad.</p>
+          {lastSavedAt && countedItems.length > 0 && (
+            <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">
+              <CloudUpload size={12} /> Borrador autoguardado {lastSavedAt}
+            </span>
+          )}
+        </div>
       </div>
+
+      {/* Borrador recuperado */}
+      {draftNotice && countedItems.length > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="flex items-start gap-2 flex-1">
+            <CloudUpload size={18} className="text-amber-700 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-amber-900">
+              <span className="font-bold">Borrador recuperado:</span> {draftNotice.count} ítem(s) del{' '}
+              {new Date(draftNotice.updatedAt).toLocaleDateString('es-CR')} {new Date(draftNotice.updatedAt).toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' })}.
+              Cada ítem que agrega se guarda automáticamente en este dispositivo.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => setDraftNotice(null)} className="px-4 py-2 bg-amber-600 text-white rounded-xl text-sm font-semibold hover:bg-amber-700">Continuar</button>
+            <button onClick={handleDiscardDraft} className="px-4 py-2 bg-white border border-amber-300 text-amber-800 rounded-xl text-sm font-medium hover:bg-amber-100">Descartar</button>
+          </div>
+        </div>
+      )}
 
       {/* Current Count List */}
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -637,6 +851,61 @@ const InventoryCount: React.FC<InventoryCountProps> = ({ products, audits, onSav
       {/* New count hint after save */}
       {!auditPreview && countedItems.length > 0 && audits.length > 0 && (
         <p className="text-xs text-gray-400 dark:text-gray-500 text-center">Después de guardar, puedes iniciar un nuevo conteo limpiando la lista.</p>
+      )}
+
+      {/* Scanner modal — solo celulares */}
+      {scanOpen && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center z-[70] p-0 sm:p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-md overflow-hidden max-h-[92vh] flex flex-col">
+            <div className="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <ScanLine size={20} /> Escanear código
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Apunte la cámara al código de barras · {scanCount} agregado(s)</p>
+              </div>
+              <button onClick={handleCloseScanner} className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"><X size={20} /></button>
+            </div>
+            <div className="p-4 space-y-3 overflow-y-auto flex-1">
+              {scanError ? (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-900">
+                  {scanError}
+                </div>
+              ) : (
+                <div className="relative rounded-xl overflow-hidden bg-black aspect-[4/3]">
+                  <video ref={videoRef} playsInline muted className="absolute inset-0 w-full h-full object-cover" />
+                  {/* Guía de encuadre */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-3/4 h-1/3 border-2 border-white/80 rounded-lg" />
+                  </div>
+                  {!scanning && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                      <p className="text-white text-sm font-medium animate-pulse">Abriendo cámara…</p>
+                    </div>
+                  )}
+                </div>
+              )}
+              {lastCode && (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-sm text-green-900 flex items-center gap-2">
+                  <CheckCircle size={16} className="flex-shrink-0" />
+                  <span>Agregado: <span className="font-bold">{lastCode}</span></span>
+                </div>
+              )}
+              {scanMiss && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-900 flex items-center gap-2">
+                  <AlertTriangle size={16} className="flex-shrink-0" />
+                  <span>Código <span className="font-mono font-bold">{scanMiss}</span> no está registrado en el inventario.</span>
+                </div>
+              )}
+              <p className="text-xs text-gray-400 text-center">Cada lectura suma 1 unidad (con autoguardado). Puede seguir escaneando sin cerrar.</p>
+            </div>
+            <div className="p-4 border-t border-gray-100 dark:border-gray-800 flex-shrink-0">
+              <button onClick={handleCloseScanner} className="w-full px-5 py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold">
+                Terminar ({countedItems.length} ítems en conteo)
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

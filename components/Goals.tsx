@@ -7,9 +7,9 @@ import { GeminiService } from '../services/geminiService';
 interface GoalsProps {
   entries: DailyEntry[];
   settings: AppSettings;
-  onSaveEntry: (entry: DailyEntry) => void;
+  onSaveEntry: (entry: DailyEntry) => void | Promise<void>;
   onDeleteEntry: (id: string) => void;
-  onSaveSettings: (s: AppSettings) => void;
+  onSaveSettings: (s: AppSettings) => void | Promise<void>;
 }
 
 const currentMonthStr = () => new Date().toISOString().slice(0, 7);
@@ -18,6 +18,20 @@ const daysInMonthOf = (monthStr: string) => {
   const [y, m] = monthStr.split('-').map(Number);
   return new Date(y, m, 0).getDate();
 };
+
+// ── Días laborables (se excluyen los domingos, día de descanso) ──
+const isSundayDay = (y: number, m: number, d: number) => new Date(y, m - 1, d).getDay() === 0;
+
+const countWorkingDays = (monthStr: string, fromDay: number, toDay: number) => {
+  const [y, m] = monthStr.split('-').map(Number);
+  let c = 0;
+  for (let d = fromDay; d <= toDay; d++) {
+    if (!isSundayDay(y, m, d)) c++;
+  }
+  return c;
+};
+
+const workingDaysInMonthOf = (monthStr: string) => countWorkingDays(monthStr, 1, daysInMonthOf(monthStr));
 
 const Goals: React.FC<GoalsProps> = ({ entries, settings, onSaveEntry, onDeleteEntry, onSaveSettings }) => {
   const { user } = useAuth();
@@ -58,11 +72,13 @@ const Goals: React.FC<GoalsProps> = ({ entries, settings, onSaveEntry, onDeleteE
   }, [viewMonth]);
 
   const daysInMonth = daysInMonthOf(viewMonth);
+  const workingDaysInMonth = workingDaysInMonthOf(viewMonth);
   const todayDay = new Date().getDate();
-  const elapsedDays = monthRelation === 'current' ? todayDay : monthRelation === 'past' ? daysInMonth : 0;
+  // Los domingos no se trabajan: no cuentan ni en días transcurridos ni en restantes
+  const elapsedDays = monthRelation === 'current' ? countWorkingDays(viewMonth, 1, todayDay) : monthRelation === 'past' ? workingDaysInMonth : 0;
   const remainingDays = monthRelation === 'current'
-    ? Math.max(daysInMonth - todayDay + 1, 1)
-    : monthRelation === 'future' ? daysInMonth : 0;
+    ? countWorkingDays(viewMonth, todayDay, daysInMonth)
+    : monthRelation === 'future' ? workingDaysInMonth : 0;
 
   const remaining = Math.max(target - income, 0);
   const progress = target > 0 ? Math.min((income / target) * 100, 100) : 0;
@@ -70,22 +86,30 @@ const Goals: React.FC<GoalsProps> = ({ entries, settings, onSaveEntry, onDeleteE
   const neededPerDay = target > 0 && remainingDays > 0 && !goalMet ? remaining / remainingDays : 0;
   const avgPerDay = elapsedDays > 0 ? income / elapsedDays : 0;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.date || !formData.amount || formData.amount <= 0) {
       alert('Ingrese una fecha y un monto mayor a cero.');
       return;
     }
+    const trimmedNote = (formData.note || '').trim();
+    const creator = (user as any)?.uid || (user as any)?.email || '';
     const newEntry: DailyEntry = {
       id: crypto.randomUUID(),
       date: formData.date,
       type: formData.type === 'expense' ? 'expense' : 'income',
       amount: Number(formData.amount),
       currency: formData.currency || settings.currency || 'CRC',
-      note: formData.note?.trim() || undefined,
-      createdBy: (user as any)?.uid || (user as any)?.email || undefined,
+      ...(trimmedNote ? { note: trimmedNote } : {}),
+      ...(creator ? { createdBy: creator } : {}),
     };
-    onSaveEntry(newEntry);
+    try {
+      await onSaveEntry(newEntry);
+    } catch (err) {
+      console.error('Error al guardar el monto diario', err);
+      alert('No se pudo guardar el monto. Revise su conexión o permisos e intente de nuevo.');
+      return;
+    }
     setIsModalOpen(false);
     setFormData({
       date: new Date().toISOString().split('T')[0],
@@ -96,13 +120,19 @@ const Goals: React.FC<GoalsProps> = ({ entries, settings, onSaveEntry, onDeleteE
     });
   };
 
-  const handleSaveGoal = () => {
+  const handleSaveGoal = async () => {
     const value = Number(goalInput);
     if (isNaN(value) || value < 0) {
       alert('Ingrese una meta válida mayor o igual a cero.');
       return;
     }
-    onSaveSettings({ ...settings, monthlyGoalTarget: value });
+    try {
+      await onSaveSettings({ ...settings, monthlyGoalTarget: value });
+    } catch (err) {
+      console.error('Error al guardar la meta mensual', err);
+      alert('No se pudo guardar la meta. Revise su conexión o permisos e intente de nuevo.');
+      return;
+    }
     setIsEditingGoal(false);
   };
 
@@ -256,19 +286,19 @@ const Goals: React.FC<GoalsProps> = ({ entries, settings, onSaveEntry, onDeleteE
               <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4">
                 <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide flex items-center gap-1"><DollarSign size={12} /> Se necesita por día</p>
                 <p className="text-2xl font-black text-gray-900 dark:text-white mt-1">
-                  {monthRelation === 'past' ? '—' : goalMet ? `${currencySymbol} 0` : `${currencySymbol} ${Math.ceil(neededPerDay).toLocaleString()}`}
+                  {monthRelation === 'past' ? '—' : goalMet ? `${currencySymbol} 0` : remainingDays === 0 ? `${currencySymbol} ${remaining.toLocaleString()}` : `${currencySymbol} ${Math.ceil(neededPerDay).toLocaleString()}`}
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                   {monthRelation === 'current'
-                    ? goalMet ? 'Meta ya alcanzada este mes' : `entre ${remainingDays} día${remainingDays !== 1 ? 's' : ''} restante${remainingDays !== 1 ? 's' : ''} (incluye hoy)`
-                    : monthRelation === 'future' ? `promedio diario para todo el mes (${daysInMonth} días)` : 'mes cerrado'}
+                    ? goalMet ? 'Meta ya alcanzada este mes' : remainingDays === 0 ? 'No quedan días laborables (domingos cerrado)' : `entre ${remainingDays} día${remainingDays !== 1 ? 's' : ''} laborable${remainingDays !== 1 ? 's' : ''} restante${remainingDays !== 1 ? 's' : ''} (sin domingos, incluye hoy)`
+                    : monthRelation === 'future' ? `promedio diario en días laborables (${workingDaysInMonth} días, sin domingos)` : 'mes cerrado'}
                 </p>
               </div>
               <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4">
                 <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide flex items-center gap-1"><TrendingUp size={12} /> Promedio diario logrado</p>
                 <p className="text-2xl font-black text-gray-900 dark:text-white mt-1">{currencySymbol} {Math.round(avgPerDay).toLocaleString()}</p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                  {elapsedDays > 0 ? `en ${elapsedDays} día${elapsedDays !== 1 ? 's' : ''} transcurridos` : 'aún no inicia el mes'}
+                  {elapsedDays > 0 ? `en ${elapsedDays} día${elapsedDays !== 1 ? 's laborables' : ' laborable'} transcurridos (sin domingos)` : 'aún no inicia el mes'}
                 </p>
               </div>
               <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4">

@@ -152,8 +152,10 @@ const Workspace: React.FC = () => {
         setQuotes(quotesData);
         setLabOrders(labOrdersData);
         setDailyEntries(entriesData);
-        // Si no hay productos y estamos en modo demo/localStorage, sembrar datos de ejemplo
-        if (prodData.length === 0) {
+        // Datos de ejemplo SOLO en modo demo local (sin organización/Firebase).
+        // En una organización real nunca se siembra: si el usuario elimina todo
+        // el inventario, debe quedar vacío y no "revivir" al recargar.
+        if (prodData.length === 0 && !effectiveOrgId) {
           try {
             await StorageService.seedData(effectiveOrgId);
             const seeded = await StorageService.getProducts(effectiveOrgId).catch(() => [] as Product[]);
@@ -177,13 +179,47 @@ const Workspace: React.FC = () => {
     await StorageService.addProduct(p, orgId ?? undefined);
   };
   const handleUpdateProduct = async (p: Product) => {
+    const backup = products;
     setProducts(prev => prev.map(x => x.id === p.id ? p : x));
-    await StorageService.updateProduct(p, orgId ?? undefined);
+    try {
+      await StorageService.updateProduct(p, orgId ?? undefined);
+    } catch (error) {
+      console.error('Error al actualizar el producto', error);
+      setProducts(backup);
+      const code = (error as { code?: string })?.code || 'desconocido';
+      alert(`No se pudo guardar el producto (error: ${code}). Revise su conexión o permisos e intente de nuevo.`);
+    }
   };
   const handleDeleteProduct = async (id: string) => {
     if (!confirm('¿Eliminar este producto?')) return;
+    const backup = products;
     setProducts(prev => prev.filter(p => p.id !== id));
-    await StorageService.deleteProduct(id, orgId ?? undefined);
+    try {
+      await StorageService.deleteProduct(id, orgId ?? undefined);
+    } catch (error) {
+      console.error('Error al eliminar el producto', error);
+      setProducts(backup);
+      const code = (error as { code?: string })?.code || 'desconocido';
+      alert(`No se pudo eliminar el producto (error: ${code}). Copie este código y repórtelo. Se requiere permiso de Inventario.`);
+    }
+  };
+  const handleBulkImportProducts = async (list: Product[]) => {
+    await StorageService.bulkUpsertProducts(list, orgId ?? undefined);
+    // Recargar para reflejar fusiones por SKU (sin duplicados)
+    const fresh = await StorageService.getProducts(orgId ?? undefined).catch(() => null);
+    if (fresh) setProducts(fresh);
+    else {
+      setProducts(prev => {
+        const bySku = new Map(prev.map(p => [String(p.sku || '').toLowerCase(), p]));
+        const merged = [...prev];
+        for (const p of list) {
+          const idx = merged.findIndex(x => String(x.sku || '').toLowerCase() === String(p.sku || '').toLowerCase());
+          if (idx >= 0) merged[idx] = { ...merged[idx], ...p, id: merged[idx].id };
+          else { merged.push(p); bySku.set(String(p.sku || '').toLowerCase(), p); }
+        }
+        return merged;
+      });
+    }
   };
   const handleAddCustomer = async (c: Customer) => {
     setCustomers(prev => [...prev, c]);
@@ -277,16 +313,38 @@ const Workspace: React.FC = () => {
   };
   const handleSaveDailyEntry = async (entry: DailyEntry) => {
     setDailyEntries(prev => [entry, ...prev]);
-    await StorageService.saveDailyEntry(entry, orgId ?? undefined);
+    try {
+      await StorageService.saveDailyEntry(entry, orgId ?? undefined);
+    } catch (error) {
+      console.error('Error al guardar el registro diario', error);
+      // Revertir cambio optimista para no mostrar datos que no se persistieron
+      setDailyEntries(prev => prev.filter(e => e.id !== entry.id));
+      throw error;
+    }
   };
   const handleDeleteDailyEntry = async (id: string) => {
     if (!confirm('¿Eliminar este registro diario?')) return;
+    const backup = dailyEntries;
     setDailyEntries(prev => prev.filter(e => e.id !== id));
-    await StorageService.deleteDailyEntry(id, orgId ?? undefined);
+    try {
+      await StorageService.deleteDailyEntry(id, orgId ?? undefined);
+    } catch (error) {
+      console.error('Error al eliminar el registro diario', error);
+      setDailyEntries(backup);
+      alert('No se pudo eliminar el registro. Intente de nuevo.');
+    }
   };
   const handleSaveSettings = async (s: AppSettings) => {
+    const backup = settings;
     setSettings(s);
-    await StorageService.saveSettings(s, orgId ?? undefined);
+    try {
+      await StorageService.saveSettings(s, orgId ?? undefined);
+    } catch (error) {
+      console.error('Error al guardar la configuración', error);
+      setSettings(backup);
+      alert('No se pudo guardar la configuración. Revise su conexión o permisos e intente de nuevo.');
+      throw error;
+    }
   };
   const handleUpdateStock = (_productId: string, _qty: number) => {};
 
@@ -301,12 +359,13 @@ const Workspace: React.FC = () => {
         <Route path="/inventory" element={
           <PermGuard perm="manage_inventory">
             <Inventory products={products} onAddProduct={handleAddProduct}
-              onUpdateProduct={handleUpdateProduct} onDeleteProduct={handleDeleteProduct} />
+              onUpdateProduct={handleUpdateProduct} onDeleteProduct={handleDeleteProduct}
+              onBulkImport={handleBulkImportProducts} />
           </PermGuard>
         } />
         <Route path="/inventory-count" element={
           <PermGuard perm="manage_inventory">
-            <InventoryCount products={products} audits={inventoryAudits} onSaveAudit={handleSaveInventoryAudit} />
+            <InventoryCount products={products} audits={inventoryAudits} onSaveAudit={handleSaveInventoryAudit} draftKey={orgId ?? 'local'} />
           </PermGuard>
         } />
         <Route path="/customers" element={

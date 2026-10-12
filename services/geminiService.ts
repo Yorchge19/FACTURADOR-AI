@@ -135,9 +135,9 @@ export const GeminiService = {
         Mes: ${summary.monthLabel}
         Meta mensual: ${summary.target}
         Acumulado: ${summary.accumulated} (${summary.progress.toFixed(1)}%)
-        Faltante: ${summary.remaining} en ${summary.remainingDays} día(s) restante(s)
-        Monto necesario por día: ${summary.neededPerDay.toFixed(0)}
-        Promedio diario logrado: ${summary.avgPerDay.toFixed(0)}
+        Faltante: ${summary.remaining} en ${summary.remainingDays} día(s) laborable(s) restante(s) (domingos cerrado, no cuentan)
+        Monto necesario por día laborable: ${summary.neededPerDay.toFixed(0)}
+        Promedio diario logrado (solo días laborables, sin domingos): ${summary.avgPerDay.toFixed(0)}
         Gastos del mes: ${summary.monthExpenses}
       `;
 
